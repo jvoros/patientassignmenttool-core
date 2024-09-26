@@ -9,8 +9,9 @@ type Role = "physician" | "app" | "resident";
 
 type ScheduleItem = {
   name: string;
-  role: Role;
+  role: string;
   bonus: number;
+  joinZones: ZoneId[];
 };
 
 type Site = {
@@ -32,7 +33,7 @@ type Board = {
   shifts: {
     [id: ShiftId]: Shift;
   };
-  event: BoardEvent[];
+  events: BoardEvent[];
 };
 
 // ZONES
@@ -49,10 +50,10 @@ type ZoneType = "list" | "simple" | "rotation" | "supervisor";
 type Zone = {
   id: string;
   name: string;
-  type: ZoneType;
-  nextPt?: ShiftId;
-  nextSuper?: ShiftId;
-  superFrom?: ZoneId;
+  type: string;
+  nextPt?: ShiftId | undefined;
+  nextSuper?: ShiftId | undefined;
+  superFrom?: ZoneId | undefined;
   shifts: ShiftId[];
 };
 
@@ -63,6 +64,8 @@ type ZoneId = Zone["id"];
 type Shift = {
   id: string;
   name: string;
+  role: string;
+  bonus: number;
   provider: Provider;
   counts: {
     [ptType: string]: number;

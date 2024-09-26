@@ -77,13 +77,13 @@ The `board` object is the current state of that site. The `events` array can be 
       "off": {
         "id": "off",
         "name": "Off",
-        "zoneType": "zone",
+        "zoneType": "list",
         "shifts": []
       },
       "main": {
         "id": "main",
         "name": "Main",
-        "zoneType": "rotationWithSupervisor",
+        "zoneType": "supervisor",
         "nextPt": "one",
         "nextSuper": "one",
         "shifts": ["two", "one"]
@@ -91,7 +91,7 @@ The `board` object is the current state of that site. The `events` array can be 
       "fasttrack": {
         "id": "fasttrack",
         "name": "Fast Track",
-        "zoneType": "zoneWithPatients",
+        "zoneType": "simple",
         "superFrom": "main", // id of rotation that provides supervisor
         "nextPt": "three",
         "shifts": ["three"]
@@ -102,6 +102,8 @@ The `board` object is the current state of that site. The `events` array can be 
       "one": {
         "id": "one",
         "name": "6a-3p",
+        "role": "physician",
+        "bonus": 2,
         "provider": {
           "last": "Voros",
           "first": "Jeremy"
@@ -117,6 +119,8 @@ The `board` object is the current state of that site. The `events` array can be 
       "two": {
         "id": "two",
         "name": "8a-6p",
+        "role": "physician",
+        "bonus": 2,
         "provider": {
           "last": "Blake",
           "first": "Kelly"
@@ -126,6 +130,8 @@ The `board` object is the current state of that site. The `events` array can be 
       "three": {
         "id": "three",
         "name": "6a-3p APP",
+        "role": "app",
+        "bonus": 0,
         "provider": {
           "last": "Cheever",
           "first": "Shelley"
