@@ -1,0 +1,20 @@
+{
+  "name": "pat-not-prototype",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "tsc": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
+  },
+  "dependencies": {
+    "mongodb": "^6.9.0",
+    "short-unique-id": "^5.2.0"
+  }
+}
