@@ -106,8 +106,13 @@ The `board` object is the current state of that site. The `events` array can be 
           "last": "Voros",
           "first": "Jeremy"
         },
-        "patients": 3,
-        "supervised": 3
+        "counts": {
+          "walkin": 1,
+          "ambo": 1,
+          "ft": 1,
+          "supervised": 1,
+          "bounty": 1
+        }
       },
       "two": {
         "id": "two",
@@ -116,8 +121,7 @@ The `board` object is the current state of that site. The `events` array can be 
           "last": "Blake",
           "first": "Kelly"
         },
-        "patients": 1,
-        "supervised": 0
+        "counts": {}
       },
       "three": {
         "id": "three",
@@ -126,8 +130,7 @@ The `board` object is the current state of that site. The `events` array can be 
           "last": "Cheever",
           "first": "Shelley"
         },
-        "patients": 3,
-        "supervised": 0
+        "counts": {}
       }
     },
 

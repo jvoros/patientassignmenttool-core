@@ -64,9 +64,9 @@ type Shift = {
   id: string;
   name: string;
   provider: Provider;
-  patients: number;
-  supervised: number;
-  bounty?: number;
+  counts: {
+    [ptType: string]: number;
+  };
 };
 
 type ShiftId = Shift["id"];
