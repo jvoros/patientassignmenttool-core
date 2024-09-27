@@ -39,25 +39,27 @@ type Board = {
 // ZONES
 
 // ZONE TYPES
-// list: just a list of shifts
-// simple: list of shifts, first shift always up next
+// zone: just a list of shifts
+// zone_patient: list of shifts, first shift always up next
 // rotation: adds at up next index, can move who is up next
-// supervisor: rotation, but also has nextSupervisor
+// rotation_super: rotation, but also has supervisor
 // any zone can get a supervisor from another zone
 
-type ZoneType = "list" | "simple" | "rotation" | "supervisor";
+type ZoneType = "zone" | "zone_patient" | "rotation" | "rotation_super";
+
+type ZoneId = Zone["id"];
 
 type Zone = {
   id: string;
   name: string;
   type: string;
-  nextPt?: ShiftId | undefined;
-  nextSuper?: ShiftId | undefined;
   superFrom?: ZoneId | undefined;
+  active: {
+    patient: ShiftId | null;
+    staff: ShiftId | null;
+  };
   shifts: ShiftId[];
 };
-
-type ZoneId = Zone["id"];
 
 // SHIFTS
 

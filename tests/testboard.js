@@ -6,14 +6,17 @@ export default {
       id: "off",
       name: "Off",
       type: "list",
+      active: { patient: null, staff: null },
       shifts: ["four"],
     },
     main: {
       id: "main",
       name: "Main",
-      type: "supervisor",
-      nextPt: "one",
-      nextSuper: "one",
+      type: "rotation_super",
+      active: {
+        patient: "one",
+        staff: "one",
+      },
       shifts: ["two", "one"],
     },
     fasttrack: {
@@ -21,7 +24,7 @@ export default {
       name: "Fast Track",
       type: "simple",
       superFrom: "main", // id of rotation that provides supervisor
-      nextPt: "three",
+      active: { patient: null, staff: null },
       shifts: ["three"],
     },
   },
@@ -74,6 +77,17 @@ export default {
       provider: {
         last: "Kasavana",
         first: "Brian",
+      },
+      counts: {},
+    },
+    five: {
+      id: "five",
+      name: "11a-9p",
+      role: "physician",
+      bonus: 2,
+      provider: {
+        last: "Hart",
+        first: "Mike",
       },
       counts: {},
     },
