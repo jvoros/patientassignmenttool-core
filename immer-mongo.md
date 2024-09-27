@@ -15,19 +15,18 @@ Now the workflow is:
 1. On startup, server gets site from database.
 2. Server broadcasts site.board to all clients.
 3. Client sends action to server.
-4. Server uses Immer to make newBoard by applying action, saving the inversePatches.
-5. Server adds Event to board, with the saved inversePatches.
-
-- the inversePatches cannot include the adding of the Event. That is impossible since the inversePatch for adding the event would have to include the inversePatch itself.
-- **Adding the event must be a separate action from the main action itself.**
-
-5. Server sends newBoard to Mongo to update Site document.
-6. On success from Mongo, Server broadcasts newBoard, from memory, to all clients.
-7. To undo an event:
+4. Server uses Immer to make newBoard by applying action, and adding Event (without `inversePatches`).
+5. Server saves the inversePatches from the action in step 4.
+6. Server adds inversePatches to Event on board.
+7. Server sends newBoard to Mongo to update `Site.board`.
+8. On success from Mongo, Server broadcasts newBoard, from memory, to all clients.
+9. To undo an event:
 
 - remove the first event in array
-- apply inversePatches to state
-- send to Mongo to update Site.board
+- remove inversePatches from first event in array
+- _now board is equivalent to state produced by these patches_
+- apply inversePatches
+- send to Mongo to update `Site.board`
 - broadcast to clients
 
 There is one request from client to server. One request from server to DB. One response from server to all clients.
@@ -42,130 +41,7 @@ The `site` object is the static info related to the site: providers, schedule an
 
 The `board` object is the current state of that site. The `events` array can be limited to `site.event_limit`.
 
-```json
-{
-  "site": {
-    "id": "SiteId",
-
-    "event_limit": 25,
-
-    "providers": [
-      { "last": "Voros", "first": "Jeremy", "role": "physician" },
-      { "last": "Blake", "first": "Kelly", "role": "physician" }
-    ],
-
-    "schedule": [
-      {
-        "name": "6a-3p",
-        "role": "physician",
-        "bonus": 2,
-        "joinZones": ["main"]
-      },
-      {
-        "name": "6a-3p APP",
-        "role": "app",
-        "bonus": 0,
-        "joinZones": ["fasttrack", "flex"]
-      }
-    ]
-  },
-
-  "board": {
-    "date": "09/25/2004",
-
-    "zones": {
-      "off": {
-        "id": "off",
-        "name": "Off",
-        "zoneType": "list",
-        "shifts": []
-      },
-      "main": {
-        "id": "main",
-        "name": "Main",
-        "zoneType": "supervisor",
-        "nextPt": "one",
-        "nextSuper": "one",
-        "shifts": ["two", "one"]
-      },
-      "fasttrack": {
-        "id": "fasttrack",
-        "name": "Fast Track",
-        "zoneType": "simple",
-        "superFrom": "main", // id of rotation that provides supervisor
-        "nextPt": "three",
-        "shifts": ["three"]
-      }
-    },
-
-    "shifts": {
-      "one": {
-        "id": "one",
-        "name": "6a-3p",
-        "role": "physician",
-        "bonus": 2,
-        "provider": {
-          "last": "Voros",
-          "first": "Jeremy"
-        },
-        "counts": {
-          "walkin": 1,
-          "ambo": 1,
-          "ft": 1,
-          "supervised": 1,
-          "bounty": 1
-        }
-      },
-      "two": {
-        "id": "two",
-        "name": "8a-6p",
-        "role": "physician",
-        "bonus": 2,
-        "provider": {
-          "last": "Blake",
-          "first": "Kelly"
-        },
-        "counts": {}
-      },
-      "three": {
-        "id": "three",
-        "name": "6a-3p APP",
-        "role": "app",
-        "bonus": 0,
-        "provider": {
-          "last": "Cheever",
-          "first": "Shelley"
-        },
-        "counts": {}
-      }
-    },
-
-    "events": [
-      {
-        "type": "assign",
-        "room": 4,
-        "mode": "ambulance",
-        "provider": "Jeremy Voros",
-        "supervisor": "Kelly Blake",
-        "inversePatches": "immer inversePatches go here"
-      },
-      {
-        "type": "move",
-        "provider": "Jeremy Voros",
-        "inversePatches": "immer inversePatches go here"
-      },
-      {
-        "type": "assign",
-        "room": 4,
-        "mode": "ambulance",
-        "provider": "Jeremy Voros",
-        "supervisor": "Kelly Blake",
-        "inversePatches": "immer inversePatches go here"
-      }
-    ]
-  }
-}
-```
+[Sample Board](./sampleboard.js)
 
 ## Logs
 

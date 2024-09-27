@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Zone from "../src/zone";
-import Shift from "../src/shift";
-import board from "./testboard";
+import board from "../sampleboard";
 
 describe("# Zone Functions", () => {
   describe("make()", () => {
