@@ -26,8 +26,9 @@ describe("# Zone Functions", () => {
     });
 
     it("should insert at 0 for simple and list", () => {
-      const newBoard = Zone.join(board, "off", "five");
-      expect(newBoard.zones.off.shifts[0]).toBe("five");
+      const clone = structuredClone(board);
+      Zone.join(clone, "off", "five");
+      expect(clone.zones.off.shifts[0]).toBe("five");
     });
   });
 
@@ -42,15 +43,16 @@ describe("# Zone Functions", () => {
     });
 
     it("should insert at active.patient index in rotation", () => {
-      const newBoard = Zone.join(board, "main", "five");
-      expect(newBoard.zones.main.shifts[1]).toBe("five");
+      const clone = structuredClone(board);
+      Zone.join(clone, "main", "five");
+      expect(clone.zones.main.shifts[1]).toBe("five");
     });
 
     it("should insert at 0 if nextPt not set", () => {
       const board2: Board = structuredClone(board);
       board2.zones.main.active.patient = null;
-      const newBoard = Zone.join(board2, "main", "five");
-      expect(newBoard.zones.main.shifts[0]).toBe("five");
+      Zone.join(board2, "main", "five");
+      expect(board2.zones.main.shifts[0]).toBe("five");
     });
 
     it("should not allow app to join rotation_super if no doc on", () => {
@@ -64,13 +66,15 @@ describe("# Zone Functions", () => {
 
   describe("leave()", () => {
     it("should remove shift from zone", () => {
-      const newBoard = Zone.leave(board, "main", "two");
-      expect(newBoard.zones.main.shifts.includes("two")).toBe(false);
+      const clone = structuredClone(board);
+      Zone.leave(clone, "main", "two");
+      expect(clone.zones.main.shifts.includes("two")).toBe(false);
     });
     it("should handle resetting active assignments", () => {
-      const newBoard = Zone.leave(board, "main", "one");
-      expect(newBoard.zones.main.active.patient).toBe("two");
-      expect(newBoard.zones.main.active.staff).toBe("two");
+      const clone = structuredClone(board);
+      Zone.leave(clone, "main", "one");
+      expect(clone.zones.main.active.patient).toBe("two");
+      expect(clone.zones.main.active.staff).toBe("two");
     });
     it("should throw error if last doc tries to leave super zone", () => {
       const clone = structuredClone(board);
@@ -83,19 +87,30 @@ describe("# Zone Functions", () => {
 
   describe("advance()", () => {
     it("should advance actives", () => {
-      const newBoard = Zone.advance(board, "main", "patient");
-      expect(newBoard.zones.main.active.patient).toBe("two");
-      const newNewBoard = Zone.advance(newBoard, "main", "staff");
-      expect(newNewBoard.zones.main.active.staff).toBe("two");
+      const clone = structuredClone(board);
+      Zone.advance(clone, "main", "patient");
+      expect(clone.zones.main.active.patient).toBe("two");
+      Zone.advance(clone, "main", "staff");
+      expect(clone.zones.main.active.staff).toBe("two");
     });
   });
 
   describe("adjustOrder()", () => {
     it("should move shifts in zone one slot at a time", () => {
-      const newBoard = Zone.adjustOrder(board, "main", "one", 1);
-      expect(newBoard.zones.main.shifts[0]).toBe("one");
-      const newNewBoard = Zone.adjustOrder(newBoard, "main", "two", -1);
-      expect(newNewBoard.zones.main.shifts[0]).toBe("two");
+      const clone = structuredClone(board);
+      Zone.adjustOrder(clone, "main", "one", 1);
+      expect(clone.zones.main.shifts[0]).toBe("one");
+      Zone.adjustOrder(clone, "main", "two", -1);
+      expect(clone.zones.main.shifts[0]).toBe("two");
+    });
+  });
+
+  describe("provideSupervisor", () => {
+    it("should provide a Supervisor ShiftId and advance next staff", () => {
+      const clone = structuredClone(board);
+      const superv = Zone.provideSupervisor(clone, "main");
+      expect(superv).toBe("one");
+      expect(clone.zones.main.active.staff).not.toBe("one");
     });
   });
 });

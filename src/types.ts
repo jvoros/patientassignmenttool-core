@@ -33,7 +33,10 @@ type Board = {
   shifts: {
     [id: ShiftId]: Shift;
   };
-  events: BoardEvent[];
+  timeline: BoardEventId[];
+  events: {
+    [id: BoardEventId]: BoardEvent;
+  };
 };
 
 // ZONES
@@ -53,7 +56,7 @@ type Zone = {
   id: string;
   name: string;
   type: string;
-  superFrom?: ZoneId | undefined;
+  superFrom?: ZoneId;
   active: {
     patient: ShiftId | null;
     staff: ShiftId | null;
@@ -78,13 +81,17 @@ type ShiftId = Shift["id"];
 
 // EVENTS
 
+type BoardEventId = BoardEvent["id"];
+
 type BoardEvent = {
+  id: string;
   type: string;
   inversePatches: any[];
-  room?: string;
-  mode?: string;
-  provider?: string;
-  supervisor?: string;
+  message?: string;
+  detail?: string;
+  patient?: { room: string; mode: string };
+  shift?: ShiftId;
+  supervisorShift?: ShiftId;
 };
 
 // LOG

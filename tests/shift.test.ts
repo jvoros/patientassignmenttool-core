@@ -21,18 +21,19 @@ describe("# Shift Tests", () => {
 
   describe("adjustCount()", () => {
     it("should adjust counts, but not below 0", () => {
-      const newBoard = Shift.adjustCount(board, {
+      const clone = structuredClone(board);
+      Shift.adjustCount(clone, {
         shiftId: "one",
         whichCount: "walkin",
         howMuch: 1,
       });
-      expect(newBoard.shifts.one.counts.walkin).toBe(2);
-      const newBoard2 = Shift.adjustCount(board, {
+      expect(clone.shifts.one.counts.walkin).toBe(2);
+      Shift.adjustCount(clone, {
         shiftId: "one",
         whichCount: "walkin",
         howMuch: -2,
       });
-      expect(newBoard2.shifts.one.counts.walkin).toBe(0);
+      expect(clone.shifts.one.counts.walkin).toBe(0);
     });
   });
 });

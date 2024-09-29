@@ -93,27 +93,30 @@ export default {
     },
   },
 
-  events: [
-    {
+  timeline: ["three", "two", "one"],
+
+  events: {
+    one: {
+      id: "one",
       type: "assign",
-      room: "Tr A",
-      mode: "ambulance",
-      provider: "Jeremy Voros",
-      supervisor: "Kelly Blake",
+      patient: { room: "Tr A", mode: "ambulance" },
+      shift: "three",
+      supervisorShift: "two",
       inversePatches: ["immer inversePatches go here"],
     },
-    {
+    two: {
+      id: "two",
       type: "move",
-      provider: "Jeremy Voros",
+      message: "Jeremy Voros changed position.",
+      shift: "one",
       inversePatches: ["immer inversePatches go here"],
     },
-    {
+    three: {
+      id: "three",
       type: "assign",
-      room: "4",
-      mode: "ambulance",
-      provider: "Jeremy Voros",
-      supervisor: "Kelly Blake",
+      patient: { room: "4", mode: "ambulance" },
+      shift: "one",
       inversePatches: ["immer inversePatches go here"],
     },
-  ],
+  },
 };

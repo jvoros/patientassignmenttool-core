@@ -1,4 +1,7 @@
-import { produce } from "immer";
+//
+// ZONE FUNCTIONS
+// All the functions necessary to manipulate zone properties and contents
+//
 
 // MAKE
 const make = (zoneParams: { id: string; name: string; type: string; superFrom: ZoneId }): Zone => {
@@ -6,14 +9,15 @@ const make = (zoneParams: { id: string; name: string; type: string; superFrom: Z
 };
 
 // JOIN
-const join = produce((draft, zoneId: ZoneId, shiftId: ShiftId) => {
+const join = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): Board => {
   const zone = draft.zones[zoneId];
   checkForNotSupervisorShiftError(draft, zoneId, shiftId);
   const insertIndex = handleActivesAndGetIndex(draft, zone, shiftId);
   zone.shifts.splice(insertIndex, 0, shiftId);
-});
+  return draft;
+};
 
-const checkForNotSupervisorShiftError = (draft: any, zoneId: ZoneId, shiftId: ShiftId) => {
+const checkForNotSupervisorShiftError = (draft: Board, zoneId: ZoneId, shiftId: ShiftId) => {
   const isSupervisorZone = draft.zones[zoneId].type.includes("super");
   const isNoDoctorInZone = noDoctorsInZone(draft, zoneId);
   const isNotDoctorShift = draft.shifts[shiftId].role !== "physician";
@@ -24,7 +28,7 @@ const checkForNotSupervisorShiftError = (draft: any, zoneId: ZoneId, shiftId: Sh
   }
 };
 
-const handleActivesAndGetIndex = (draft: any, zone: Zone, shiftId: ShiftId): number => {
+const handleActivesAndGetIndex = (draft: Board, zone: Zone, shiftId: ShiftId): number => {
   let index = 0;
   if (zone.type.includes("rotation")) {
     index = zone.active.patient ? findIndex(zone, zone.active.patient) : index;
@@ -37,14 +41,15 @@ const handleActivesAndGetIndex = (draft: any, zone: Zone, shiftId: ShiftId): num
 };
 
 // LEAVE
-const leave = produce((draft, zoneId: ZoneId, shiftId: ShiftId) => {
+const leave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): Board => {
   const zone = draft.zones[zoneId];
   checkForLastSupervisorError(draft, zoneId, shiftId);
   handleActivesOnLeave(draft, zoneId, shiftId);
   zone.shifts = zone.shifts.filter((id) => id !== shiftId);
-});
+  return draft;
+};
 
-const checkForLastSupervisorError = (draft, zoneId: ZoneId, shiftId: ShiftId): void => {
+const checkForLastSupervisorError = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): void => {
   const { type } = draft.zones[zoneId];
   const isLastDocInSuperZone = type.includes("super") && numberDoctorsInZone(draft, zoneId) < 2;
   if (isLastDocInSuperZone) {
@@ -52,24 +57,37 @@ const checkForLastSupervisorError = (draft, zoneId: ZoneId, shiftId: ShiftId): v
   }
 };
 
-const handleActivesOnLeave = (draft, zoneId: ZoneId, shiftId: ShiftId): void => {
+const handleActivesOnLeave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): void => {
   const { active } = draft.zones[zoneId];
   Object.keys(active).forEach((key) => {
     active[key] = active[key] === shiftId ? getNext(draft, zoneId, key) : active[key];
   });
 };
 
+// PROVIDE SUPER
+const provideSupervisor = (draft: Board, zoneId: ZoneId): ShiftId => {
+  const zone = draft.zones[zoneId];
+  const { type, active } = zone;
+  if (type !== "rotation_super") throw new Error(`Zone ${zoneId} is not a Supervisor Rotation`);
+  if (!active.staff) throw new Error(`Zone ${zoneId} does not have an active supervisor.`);
+  const staff = active.staff;
+  advance(draft, zoneId, "staff");
+  return staff;
+};
+
 // ADVANCE
-const advance = produce((draft, zoneId: ZoneId, whichActive) => {
+const advance = (draft: Board, zoneId: ZoneId, whichActive: string): Board => {
   draft.zones[zoneId].active[whichActive] = getNext(draft, zoneId, whichActive);
-});
+  return draft;
+};
 
 // ADJUST ORDER
-const adjustOrder = produce((draft, zoneId: ZoneId, shiftId: ShiftId, direction: number) => {
+const adjustOrder = (draft: Board, zoneId: ZoneId, shiftId: ShiftId, direction: number): Board => {
   const zone = draft.zones[zoneId];
   const { index, nextIndex } = findIndexAndNeighbor(zone, shiftId, direction);
   zone.shifts.splice(nextIndex, 0, zone.shifts.splice(index, 1)[0]);
-});
+  return draft;
+};
 
 // GET NEXT
 const getNext = (
@@ -91,7 +109,7 @@ const getNext = (
   return nextId;
 };
 
-const checkForNoSupervisorError = (board, zoneId, whichActive) => {
+const checkForNoSupervisorError = (board: Board, zoneId: ZoneId, whichActive: string) => {
   const needNextStaffAndNoDoctorInZone = whichActive === "staff" && noDoctorsInZone(board, zoneId);
   if (needNextStaffAndNoDoctorInZone) {
     throw new Error(
@@ -139,6 +157,7 @@ export default {
   make,
   join,
   leave,
+  provideSupervisor,
   advance,
   adjustOrder,
 };
