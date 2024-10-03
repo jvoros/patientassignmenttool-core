@@ -17,7 +17,7 @@ const testPatches = [{ name: "Jeremy" }, { instrument: "Banjo" }];
 describe("# Event Tests", () => {
   describe("make()", () => {
     it("should make BoardEvents", () => {
-      expect(Object.keys(testEvent).length).toBe(7);
+      expect(Object.keys(testEvent).length).toBe(8);
     });
   });
 

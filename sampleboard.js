@@ -6,7 +6,7 @@ export default {
       id: "off",
       name: "Off",
       type: "list",
-      active: { patient: null, staff: null },
+      active: { patient: undefined, supervisor: undefined },
       shifts: ["four"],
     },
     main: {
@@ -15,16 +15,16 @@ export default {
       type: "rotation_super",
       active: {
         patient: "one",
-        staff: "one",
+        supervisor: "one",
       },
       shifts: ["two", "one"],
     },
     fasttrack: {
       id: "fasttrack",
       name: "Fast Track",
-      type: "simple",
+      type: "zone_patient",
       superFrom: "main", // id of rotation that provides supervisor
-      active: { patient: null, staff: null },
+      active: { patient: undefined, supervisor: undefined },
       shifts: ["three"],
     },
   },
@@ -43,7 +43,7 @@ export default {
         walkin: 1,
         ambo: 1,
         ft: 1,
-        supervised: 1,
+        supervisor: 1,
         bounty: 1,
       },
     },
@@ -70,7 +70,7 @@ export default {
       counts: {},
     },
     four: {
-      id: "three",
+      id: "four",
       name: "3p-11p APP",
       role: "app",
       bonus: 0,
@@ -98,6 +98,7 @@ export default {
   events: {
     one: {
       id: "one",
+      time: "09:25",
       type: "assign",
       patient: { room: "Tr A", mode: "ambulance" },
       shift: "three",
@@ -106,6 +107,7 @@ export default {
     },
     two: {
       id: "two",
+      time: "09:32",
       type: "move",
       message: "Jeremy Voros changed position.",
       shift: "one",
@@ -113,6 +115,7 @@ export default {
     },
     three: {
       id: "three",
+      time: "10:00",
       type: "assign",
       patient: { room: "4", mode: "ambulance" },
       shift: "one",

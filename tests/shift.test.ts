@@ -19,20 +19,24 @@ describe("# Shift Tests", () => {
     });
   });
 
+  describe("add()", () => {
+    it("should add new shifts to the board and return shiftId", () => {
+      const clone = structuredClone(board);
+      const shiftId = Shift.add(
+        clone,
+        { last: "Irving", first: "Julius" },
+        { name: "Dunkmaster Shift", bonus: 0, joinZones: ["main", "off"], role: "physician" }
+      );
+      expect(clone.shifts[shiftId].provider.last).toBe("Irving");
+    });
+  });
+
   describe("adjustCount()", () => {
     it("should adjust counts, but not below 0", () => {
       const clone = structuredClone(board);
-      Shift.adjustCount(clone, {
-        shiftId: "one",
-        whichCount: "walkin",
-        howMuch: 1,
-      });
+      Shift.adjustCount(clone, "one", "walkin", 1);
       expect(clone.shifts.one.counts.walkin).toBe(2);
-      Shift.adjustCount(clone, {
-        shiftId: "one",
-        whichCount: "walkin",
-        howMuch: -2,
-      });
+      Shift.adjustCount(clone, "one", "walkin", -2);
       expect(clone.shifts.one.counts.walkin).toBe(0);
     });
   });

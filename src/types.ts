@@ -58,8 +58,8 @@ type Zone = {
   type: string;
   superFrom?: ZoneId;
   active: {
-    patient: ShiftId | null;
-    staff: ShiftId | null;
+    patient: ShiftId | undefined;
+    supervisor: ShiftId | undefined;
   };
   shifts: ShiftId[];
 };
@@ -81,12 +81,27 @@ type ShiftId = Shift["id"];
 
 // EVENTS
 
+type Patient = {
+  room: string;
+  mode: string;
+};
+
 type BoardEventId = BoardEvent["id"];
 
 type BoardEvent = {
   id: string;
+  time: string;
   type: string;
   inversePatches: any[];
+  message?: string;
+  detail?: string;
+  patient?: Patient;
+  shift?: ShiftId;
+  supervisorShift?: ShiftId;
+};
+
+type EventMakeParams = {
+  type: string;
   message?: string;
   detail?: string;
   patient?: { room: string; mode: string };
@@ -105,3 +120,7 @@ type LogItem = {
   supervised: number;
   bounty?: number;
 };
+
+// UNDO
+
+type RecipeWithEvent = (draft: Board, ...args: any[]) => EventMakeParams;

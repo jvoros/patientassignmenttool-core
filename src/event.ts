@@ -3,17 +3,8 @@ const uid = new ShortUniqueId({ length: 6 });
 
 const EVENT_LIMIT = 3;
 
-type EventMakeParams = {
-  type: string;
-  message?: string;
-  detail?: string;
-  patient?: { room: string; mode: string };
-  shift?: ShiftId;
-  supervisorShift?: ShiftId;
-};
-
 const make = (options: EventMakeParams): BoardEvent => {
-  return { id: uid.rnd(), inversePatches: [], ...options };
+  return { id: uid.rnd(), time: getMountainTime(), inversePatches: [], ...options };
 };
 
 // ADD
@@ -48,18 +39,26 @@ const addReassign = (draft: Board, priorEventId: BoardEventId, newEventId: Board
 };
 
 // ADD PATCHES
-const addPatches = (draft: Board, eventId: BoardEventId, patches: object[]): Board => {
+const addPatches = (draft: any, eventId: BoardEventId, patches: any[]): Board => {
   draft.events[eventId].inversePatches = patches;
   return draft;
 };
 
-// UNDO
-const undo = () => {};
+// HELPER
+function getMountainTime(): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Denver",
+    hour12: false,
+  } as Intl.DateTimeFormatOptions);
+
+  return formatter.format(new Date());
+}
 
 export default {
   make,
   add,
   addReassign,
   addPatches,
-  undo,
 };

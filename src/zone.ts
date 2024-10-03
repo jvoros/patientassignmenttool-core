@@ -5,12 +5,16 @@
 
 // MAKE
 const make = (zoneParams: { id: string; name: string; type: string; superFrom: ZoneId }): Zone => {
-  return { ...zoneParams, active: { patient: null, staff: null }, shifts: [] };
+  return { ...zoneParams, active: { patient: undefined, supervisor: undefined }, shifts: [] };
 };
 
 // JOIN
 const join = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): Board => {
   const zone = draft.zones[zoneId];
+  // already in zone?
+  if (zone.shifts.includes(shiftId)) {
+    return draft;
+  }
   checkForNotSupervisorShiftError(draft, zoneId, shiftId);
   const insertIndex = handleActivesAndGetIndex(draft, zone, shiftId);
   zone.shifts.splice(insertIndex, 0, shiftId);
@@ -35,7 +39,7 @@ const handleActivesAndGetIndex = (draft: Board, zone: Zone, shiftId: ShiftId): n
     zone.active.patient = shiftId;
   }
   if (zone.type.includes("super") && draft.shifts[shiftId].role === "physician") {
-    zone.active.staff = zone.active.staff ?? shiftId; // Assign if not already assigned
+    zone.active.supervisor = zone.active.supervisor ?? shiftId; // Assign if not already assigned
   }
   return index;
 };
@@ -69,15 +73,20 @@ const provideSupervisor = (draft: Board, zoneId: ZoneId): ShiftId => {
   const zone = draft.zones[zoneId];
   const { type, active } = zone;
   if (type !== "rotation_super") throw new Error(`Zone ${zoneId} is not a Supervisor Rotation`);
-  if (!active.staff) throw new Error(`Zone ${zoneId} does not have an active supervisor.`);
-  const staff = active.staff;
-  advance(draft, zoneId, "staff");
-  return staff;
+  if (!active.supervisor) throw new Error(`Zone ${zoneId} does not have an active supervisor.`);
+  const supervisor = active.supervisor;
+  moveActive(draft, zoneId, "supervisor");
+  return supervisor;
 };
 
-// ADVANCE
-const advance = (draft: Board, zoneId: ZoneId, whichActive: string): Board => {
-  draft.zones[zoneId].active[whichActive] = getNext(draft, zoneId, whichActive);
+// MOVE ACTIVE
+const moveActive = (
+  draft: Board,
+  zoneId: ZoneId,
+  whichActive: string,
+  direction: number = 1
+): Board => {
+  draft.zones[zoneId].active[whichActive] = getNext(draft, zoneId, whichActive, direction);
   return draft;
 };
 
@@ -95,25 +104,28 @@ const getNext = (
   zoneId: ZoneId,
   whichActive: string,
   offset: number = 1
-): ShiftId => {
+): ShiftId | undefined => {
   checkForNoSupervisorError(board, zoneId, whichActive);
   const zone = board.zones[zoneId];
+  if (zone.type.includes("zone")) return undefined;
   const currentActiveId = zone.active[whichActive];
   const nextId = findNeighbor(zone, currentActiveId, offset);
   const nextShiftRole = board.shifts[nextId].role;
-  const needNextStaffAndNextNotDoc = whichActive === "staff" && nextShiftRole !== "physician";
+  const needNextsupervisorAndNextNotDoc =
+    whichActive === "supervisor" && nextShiftRole !== "physician";
   const newOffset = offset < 0 ? offset - 1 : offset + 1;
-  if (needNextStaffAndNextNotDoc) {
+  if (needNextsupervisorAndNextNotDoc) {
     return getNext(board, zoneId, whichActive, newOffset);
   }
   return nextId;
 };
 
 const checkForNoSupervisorError = (board: Board, zoneId: ZoneId, whichActive: string) => {
-  const needNextStaffAndNoDoctorInZone = whichActive === "staff" && noDoctorsInZone(board, zoneId);
-  if (needNextStaffAndNoDoctorInZone) {
+  const needNextsupervisorAndNoDoctorInZone =
+    whichActive === "supervisor" && noDoctorsInZone(board, zoneId);
+  if (needNextsupervisorAndNoDoctorInZone) {
     throw new Error(
-      `No doctors in Zone ${zoneId}. Can't get next staff. Prevent infinite recursion.`
+      `No doctors in Zone ${zoneId}. Can't get next supervisor. Prevent infinite recursion.`
     );
   }
 };
@@ -158,6 +170,6 @@ export default {
   join,
   leave,
   provideSupervisor,
-  advance,
+  moveActive,
   adjustOrder,
 };

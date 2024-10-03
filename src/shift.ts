@@ -20,14 +20,18 @@ const add = (draft: Board, provider: Provider, schedule: ScheduleItem): ShiftId 
 
 const adjustCount = (
   draft: Board,
-  params: { shiftId: ShiftId; whichCount: string; howMuch: number }
+  shiftId: ShiftId,
+  whichCount: string,
+  howMuch: number
 ): Board => {
-  const counts = draft.shifts[params.shiftId].counts;
-  const newCount = counts[params.whichCount] + params.howMuch;
-  counts[params.whichCount] = newCount > 0 ? newCount : 0;
+  const counts = draft.shifts[shiftId].counts;
+  const currentCount = counts[whichCount] ?? 0;
+  const newCount = currentCount + howMuch;
+  counts[whichCount] = newCount > 0 ? newCount : 0;
   return draft;
 };
 export default {
   make,
+  add,
   adjustCount,
 };
