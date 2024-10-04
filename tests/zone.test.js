@@ -50,7 +50,7 @@ describe("# Zone Functions", () => {
 
     it("should insert at 0 if nextPt not set", () => {
       const board2 = structuredClone(board);
-      board2.zones.main.active.patient = undefined;
+      board2.zones.main.active.patient = "";
       Zone.join(board2, "main", "five");
       expect(board2.zones.main.shifts[0]).toBe("five");
     });

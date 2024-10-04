@@ -29,7 +29,7 @@ describe("# Board Tests", () => {
       };
       const newBoard = Board.signIn(board, provider, schedule);
       const newEventId = newBoard.timeline[0];
-      const shift = newBoard.shifts[newBoard.events[newEventId].shift!];
+      const shift = newBoard.shifts[newBoard.events[newEventId].shift];
       expect(shift.provider.last).toBe("Irving");
       expect(newBoard.zones.off.shifts[0]).toBe(shift.id);
       expect(newBoard.zones.main.shifts.includes(shift.id)).toBe(true);
