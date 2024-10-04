@@ -24,6 +24,7 @@ export default {
       name: "Fast Track",
       type: "zone_patient",
       superFrom: "main", // id of rotation that provides supervisor
+      triggerSkip: ["app"],
       active: { patient: undefined, supervisor: undefined },
       shifts: ["three"],
     },
@@ -35,6 +36,7 @@ export default {
       name: "6a-3p",
       role: "physician",
       bonus: 2,
+      skip: 0,
       provider: {
         last: "Voros",
         first: "Jeremy",
@@ -52,6 +54,7 @@ export default {
       name: "8a-6p",
       role: "physician",
       bonus: 2,
+      skip: 0,
       provider: {
         last: "Blake",
         first: "Kelly",
@@ -63,6 +66,7 @@ export default {
       name: "6a-3p APP",
       role: "app",
       bonus: 0,
+      skip: 0,
       provider: {
         last: "Cheever",
         first: "Shelley",
@@ -74,6 +78,7 @@ export default {
       name: "3p-11p APP",
       role: "app",
       bonus: 0,
+      skip: 0,
       provider: {
         last: "Kasavana",
         first: "Brian",
@@ -85,6 +90,7 @@ export default {
       name: "11a-9p",
       role: "physician",
       bonus: 2,
+      skip: 0,
       provider: {
         last: "Hart",
         first: "Mike",
@@ -117,7 +123,7 @@ export default {
       id: "three",
       time: "10:00",
       type: "assign",
-      patient: { room: "4", mode: "ambulance" },
+      patient: { room: "4", mode: "ambo" },
       shift: "one",
       inversePatches: ["immer inversePatches go here"],
     },

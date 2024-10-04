@@ -1,7 +1,4 @@
-//
-// ZONE FUNCTIONS
-// All the functions necessary to manipulate zone properties and contents
-//
+import Shift from "./shift";
 
 // MAKE
 const make = (zoneParams: { id: string; name: string; type: string; superFrom: ZoneId }): Zone => {
@@ -16,7 +13,7 @@ const join = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): Board => {
     return draft;
   }
   checkForNotSupervisorShiftError(draft, zoneId, shiftId);
-  const insertIndex = handleActivesAndGetIndex(draft, zone, shiftId);
+  const insertIndex = setActivesAndGetIndex(draft, zone, shiftId);
   zone.shifts.splice(insertIndex, 0, shiftId);
   return draft;
 };
@@ -32,7 +29,7 @@ const checkForNotSupervisorShiftError = (draft: Board, zoneId: ZoneId, shiftId: 
   }
 };
 
-const handleActivesAndGetIndex = (draft: Board, zone: Zone, shiftId: ShiftId): number => {
+const setActivesAndGetIndex = (draft: Board, zone: Zone, shiftId: ShiftId): number => {
   let index = 0;
   if (zone.type.includes("rotation")) {
     index = zone.active.patient ? findIndex(zone, zone.active.patient) : index;
@@ -48,7 +45,7 @@ const handleActivesAndGetIndex = (draft: Board, zone: Zone, shiftId: ShiftId): n
 const leave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): Board => {
   const zone = draft.zones[zoneId];
   checkForLastSupervisorError(draft, zoneId, shiftId);
-  handleActivesOnLeave(draft, zoneId, shiftId);
+  setActivesOnLeave(draft, zoneId, shiftId);
   zone.shifts = zone.shifts.filter((id) => id !== shiftId);
   return draft;
 };
@@ -61,10 +58,12 @@ const checkForLastSupervisorError = (draft: Board, zoneId: ZoneId, shiftId: Shif
   }
 };
 
-const handleActivesOnLeave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): void => {
+const setActivesOnLeave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): void => {
   const { active } = draft.zones[zoneId];
   Object.keys(active).forEach((key) => {
-    active[key] = active[key] === shiftId ? getNext(draft, zoneId, key) : active[key];
+    if (active[key] === shiftId) {
+      advanceRotation(draft, zoneId, key);
+    }
   });
 };
 
@@ -75,18 +74,18 @@ const provideSupervisor = (draft: Board, zoneId: ZoneId): ShiftId => {
   if (type !== "rotation_super") throw new Error(`Zone ${zoneId} is not a Supervisor Rotation`);
   if (!active.supervisor) throw new Error(`Zone ${zoneId} does not have an active supervisor.`);
   const supervisor = active.supervisor;
-  moveActive(draft, zoneId, "supervisor");
+  advanceRotation(draft, zoneId, "supervisor");
   return supervisor;
 };
 
 // MOVE ACTIVE
-const moveActive = (
+const advanceRotation = (
   draft: Board,
   zoneId: ZoneId,
-  whichActive: string,
+  whichRotation: ActiveKey,
   direction: number = 1
 ): Board => {
-  draft.zones[zoneId].active[whichActive] = getNext(draft, zoneId, whichActive, direction);
+  draft.zones[zoneId].active[whichRotation] = getNext(draft, zoneId, whichRotation, direction);
   return draft;
 };
 
@@ -100,33 +99,57 @@ const adjustOrder = (draft: Board, zoneId: ZoneId, shiftId: ShiftId, direction: 
 
 // GET NEXT
 const getNext = (
-  board: Board,
+  draft: Board,
   zoneId: ZoneId,
-  whichActive: string,
+  whichActive: ActiveKey,
   offset: number = 1
-): ShiftId | undefined => {
-  checkForNoSupervisorError(board, zoneId, whichActive);
-  const zone = board.zones[zoneId];
-  if (zone.type.includes("zone")) return undefined;
-  const currentActiveId = zone.active[whichActive];
-  const nextId = findNeighbor(zone, currentActiveId, offset);
-  const nextShiftRole = board.shifts[nextId].role;
-  const needNextsupervisorAndNextNotDoc =
-    whichActive === "supervisor" && nextShiftRole !== "physician";
-  const newOffset = offset < 0 ? offset - 1 : offset + 1;
-  if (needNextsupervisorAndNextNotDoc) {
-    return getNext(board, zoneId, whichActive, newOffset);
+): ShiftId => {
+  if (whichActive === "supervisor") {
+    return getNextSupervisor(draft, zoneId, offset);
+  }
+  const zone = draft.zones[zoneId];
+  const currentId = getCurrentActiveId(zone, whichActive, zoneId);
+  const nextId = findNeighbor(zone, currentId, offset);
+  if (nextId !== currentId) {
+    const { turnOver } = Shift.startTurn(draft.shifts[nextId]);
+    return turnOver ? getNext(draft, zoneId, whichActive, offset + 1) : nextId;
   }
   return nextId;
 };
 
-const checkForNoSupervisorError = (board: Board, zoneId: ZoneId, whichActive: string) => {
-  const needNextsupervisorAndNoDoctorInZone =
-    whichActive === "supervisor" && noDoctorsInZone(board, zoneId);
-  if (needNextsupervisorAndNoDoctorInZone) {
+const getCurrentActiveId = (zone: Zone, whichActive: ActiveKey, zoneId: ZoneId): ShiftId => {
+  let activeId;
+  if (zone.type.includes("zone")) {
+    activeId = zone.shifts[0];
+  }
+  if (zone.type.includes("rotation")) {
+    activeId = zone.active.patient;
+  }
+  if (!activeId) {
+    throw new Error(`No active ${whichActive} in Zone ${zoneId}`);
+  }
+  return activeId;
+};
+
+const getNextSupervisor = (draft: Board, zoneId: ZoneId, offset: number = 1): ShiftId => {
+  const zone = draft.zones[zoneId];
+  checkForNoSupervisorError(draft, zoneId);
+  const nextId = findNeighbor(zone, zone.active.supervisor!, offset);
+  if (draft.shifts[nextId].role !== "physician") {
+    const newOffset = offset < 0 ? offset - 1 : offset + 1;
+    return getNextSupervisor(draft, zoneId, newOffset);
+  }
+  return nextId;
+};
+
+const checkForNoSupervisorError = (board: Board, zoneId: ZoneId) => {
+  if (noDoctorsInZone(board, zoneId)) {
     throw new Error(
       `No doctors in Zone ${zoneId}. Can't get next supervisor. Prevent infinite recursion.`
     );
+  }
+  if (!board.zones[zoneId].active.supervisor) {
+    throw new Error(`No active supervisor in Zone ${zoneId}.`);
   }
 };
 
@@ -170,6 +193,6 @@ export default {
   join,
   leave,
   provideSupervisor,
-  moveActive,
+  advanceRotation,
   adjustOrder,
 };

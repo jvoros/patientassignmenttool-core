@@ -2,10 +2,15 @@ import Shift from "./shift";
 import Zone from "./zone";
 import Undo from "./undo";
 import Assign from "./assign";
+import { getMountainTimeDateString } from "./dates";
 
 // RESET
-
+type Reset = (draft: Board) => Board;
 const reset = Undo.produce((draft: Board) => {
+  draft.date = getMountainTimeDateString();
+  draft.shifts = {};
+  draft.timeline = [];
+  draft.events = {};
   for (const zoneId in draft.zones) {
     draft.zones[zoneId] = {
       ...draft.zones[zoneId],
@@ -13,13 +18,11 @@ const reset = Undo.produce((draft: Board) => {
       shifts: [],
     };
   }
-  draft.shifts = {};
-  draft.timeline = [];
-  draft.events = {};
+
   // event
   const eventParams = { type: "reset", message: "Board Reset" };
   return eventParams;
-});
+}) as Reset;
 
 // SIGN IN
 
@@ -27,7 +30,7 @@ const reset = Undo.produce((draft: Board) => {
 type SignIn = (board: Board, provider: Provider, schedule: ScheduleItem) => Board;
 
 const signIn = Undo.produce((draft, provider, schedule) => {
-  const shiftId = Shift.add(draft, provider, schedule);
+  const shiftId = Shift.addToBoard(draft, provider, schedule);
   schedule.joinZones.forEach((zone: ZoneId) => {
     Zone.join(draft, zone, shiftId);
   });
@@ -122,20 +125,25 @@ const switchZone = Undo.produce((draft, leaveZoneId, joinZoneId, shiftId) => {
 
 // CHANGE ACTIVE
 
-type MoveActive = (draft: Board, zoneId: ZoneId, whichActive: string, direction: number) => Board;
-const moveActive = Undo.produce((draft, zoneId, whichActive, direction) => {
-  Zone.moveActive(draft, zoneId, whichActive, direction);
+type AdvanceRotation = (
+  draft: Board,
+  zoneId: ZoneId,
+  whichActive: string,
+  direction: number
+) => Board;
+const advanceRotation = Undo.produce((draft, zoneId, whichActive, direction) => {
+  Zone.advanceRotation(draft, zoneId, whichActive, direction);
   // event
   const dir = direction === 1 ? "forward to" : "back to";
   const active = getActiveMessage(whichActive);
   const affectedShiftId = draft.zones[zoneId].active[whichActive];
   const { last, first } = draft.shifts[affectedShiftId].provider;
   const eventParams = {
-    type: "moveActive",
+    type: "advanceRotation",
     message: `${active} moved ${dir} ${first} ${last}.`,
   };
   return eventParams;
-}) as MoveActive;
+}) as AdvanceRotation;
 
 const getActiveMessage = (whichActive: string): string => {
   return whichActive === "supervisor"
@@ -162,6 +170,37 @@ const changePosition = Undo.produce((draft, zoneId, shiftId, dir) => {
   return eventParams;
 }) as ChangePosition;
 
+// PAUSE & UNPAUSE SHIFT
+type PauseShift = (draft: Board, shiftId: ShiftId) => Board;
+const pauseShift = Undo.produce((draft, shiftId) => {
+  const shift = draft.shifts[shiftId];
+  Shift.pauseTurn(shift);
+
+  // event
+  const { last, first } = shift.provider;
+  const eventParams = {
+    type: "pauseShift",
+    shift: shiftId,
+    message: `${first} ${last} paused.`,
+  };
+  return eventParams;
+}) as PauseShift;
+
+type UnpauseShift = (draft: Board, shiftId: ShiftId) => Board;
+const unpauseShift = Undo.produce((draft, shiftId) => {
+  const shift = draft.shifts[shiftId];
+  Shift.resumeTurn(shift);
+
+  // event
+  const { last, first } = shift.provider;
+  const eventParams = {
+    type: "unpauseShift",
+    shift: shiftId,
+    message: `${first} ${last} unpaused.`,
+  };
+  return eventParams;
+}) as UnpauseShift;
+
 export default {
   reset,
   undo: Undo.undo,
@@ -170,8 +209,10 @@ export default {
   joinZone,
   leaveZone,
   switchZone,
-  moveActive,
+  advanceRotation,
   changePosition,
+  pauseShift,
+  unpauseShift,
   assignToShift: Assign.assignToShift,
   assignToZone: Assign.assignToZone,
   reassignPatient: Assign.reassignPatient,

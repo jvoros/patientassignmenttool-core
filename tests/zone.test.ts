@@ -34,7 +34,7 @@ describe("# Zone Functions", () => {
 
   describe("join()", () => {
     it("should update active if empty in rotation or supervisor", () => {
-      const board2: Board = structuredClone(board);
+      const board2 = structuredClone(board);
       board2.zones.main.active.patient = undefined;
       board2.zones.main.active.supervisor = undefined;
       const newBoard = Zone.join(board2, "main", "five");
@@ -49,14 +49,14 @@ describe("# Zone Functions", () => {
     });
 
     it("should insert at 0 if nextPt not set", () => {
-      const board2: Board = structuredClone(board);
+      const board2 = structuredClone(board);
       board2.zones.main.active.patient = undefined;
       Zone.join(board2, "main", "five");
       expect(board2.zones.main.shifts[0]).toBe("five");
     });
 
     it("should not allow app to join rotation_super if no doc on", () => {
-      const board2: Board = structuredClone(board);
+      const board2 = structuredClone(board);
       board2.zones.main.shifts = [];
       expect(() => {
         Zone.join(board2, "main", "four");
@@ -85,13 +85,25 @@ describe("# Zone Functions", () => {
     });
   });
 
-  describe("moveActive()", () => {
+  describe("advanceRotation()", () => {
     it("should move actives", () => {
       const clone = structuredClone(board);
-      Zone.moveActive(clone, "main", "patient");
+      Zone.advanceRotation(clone, "main", "patient");
       expect(clone.zones.main.active.patient).toBe("two");
-      Zone.moveActive(clone, "main", "supervisor");
+      Zone.advanceRotation(clone, "main", "supervisor");
       expect(clone.zones.main.active.supervisor).toBe("two");
+    });
+    it("should skip shift if skip > 0", () => {
+      const clone = structuredClone(board);
+      clone.shifts.two.skip = 1;
+      Zone.advanceRotation(clone, "main", "patient");
+      expect(clone.zones.main.active.patient).toBe("one");
+    });
+    it("should decrement skip after skipping", () => {
+      const clone = structuredClone(board);
+      clone.shifts.two.skip = 1;
+      Zone.advanceRotation(clone, "main", "patient");
+      expect(clone.shifts.two.skip).toBe(0);
     });
   });
 

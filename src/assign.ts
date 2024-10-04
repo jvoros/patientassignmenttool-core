@@ -4,32 +4,29 @@ import Undo from "./undo";
 
 // ASSIGN
 type AssignToShift = (draft: Board, zoneId: ZoneId, shiftId: ShiftId, patient: Patient) => Board;
+const assignToShift = Undo.produce(
+  (draft: Board, zoneId: ZoneId, shiftId: ShiftId, patient: Patient) => {
+    const shift = draft.shifts[shiftId];
+    Shift.addPatient(shift, patient);
+    const supervisorId = assignSupervisorIfNeeded(draft, zoneId, shift.role);
+    return createAssignEventParams(shift, supervisorId, patient);
+  }
+) as AssignToShift;
 
-// need unwrapped version to reuse in assignToZone
-const assignToShiftRecipe: RecipeWithEvent = (
-  draft: Board,
-  zoneId: ZoneId,
-  shiftId: ShiftId,
+const createAssignEventParams = (
+  shift: Shift,
+  superShiftId: ShiftId | undefined,
   patient: Patient
-) => {
-  const shift = draft.shifts[shiftId];
-  Shift.adjustCount(draft, shiftId, patient.mode, 1);
-
-  const supervisorId = assignSupervisorIfNeeded(draft, zoneId, shift.role);
-
-  // event
+): EventMakeParams => {
   const { last, first } = shift.provider;
-  const eventParams = {
+  return {
     type: "assign",
     shift: shift.id,
-    supervisorShift: supervisorId ?? undefined,
+    supervisorShift: superShiftId,
     patient,
     message: `Room ${patient.room} assigned to ${first} ${last}`,
   };
-  return eventParams;
 };
-
-const assignToShift = Undo.produce(assignToShiftRecipe) as AssignToShift;
 
 const assignSupervisorIfNeeded = (
   draft: Board,
@@ -39,8 +36,8 @@ const assignSupervisorIfNeeded = (
   if (role !== "physician") {
     const zone = draft.zones[zoneId];
     const { superZoneId, superShiftId } = getSuperZoneAndShift(draft, zone);
-    Shift.adjustCount(draft, superShiftId, "supervisor", 1);
-    Zone.moveActive(draft, superZoneId, "supervisor");
+    Shift.addSupervisor(draft.shifts[superShiftId]);
+    Zone.advanceRotation(draft, superZoneId, "supervisor");
     return superShiftId;
   }
   return undefined;
@@ -67,10 +64,15 @@ const getSuperZoneAndShift = (
 type AssignToZone = (draft: Board, zoneId: ZoneId, patient: Patient) => Board;
 
 const assignToZone = Undo.produce((draft, zoneId, patient) => {
+  const zone = draft.zones[zoneId];
   const shift = getActiveShift(draft, zoneId);
-  const eventParams = assignToShiftRecipe(draft, zoneId, shift.id, patient);
-  advanceRotationIfNeeded(draft, zoneId, shift);
-  return eventParams;
+  const { turnOver } = Shift.addPatientOnTurn(shift, patient);
+  if (turnOver) {
+    handleTurnOver(draft, zoneId);
+  }
+  handleTriggerSkip(zone, shift);
+  const supervisorId = assignSupervisorIfNeeded(draft, zoneId, shift.role);
+  return createAssignEventParams(shift, supervisorId, patient);
 }) as AssignToZone;
 
 const getActiveShift = (draft: Board, zoneId: ZoneId): Shift => {
@@ -82,37 +84,34 @@ const getActiveShift = (draft: Board, zoneId: ZoneId): Shift => {
   return draft.shifts[shiftId];
 };
 
-// may need to expand with bounty
-const advanceRotationIfNeeded = (draft: Board, zoneId: ZoneId, shift: Shift) => {
-  const total = Object.keys(shift.counts).reduce((acc, key) => {
-    return key === "supervisor" ? acc : acc + shift.counts[key];
-  }, 0);
-  if (total > shift.bonus) {
-    Zone.moveActive(draft, zoneId, "patient");
+const handleTurnOver = (draft: Board, zoneId: ZoneId): void => {
+  Zone.advanceRotation(draft, zoneId, "patient");
+};
+
+const handleTriggerSkip = (zone: Zone, shift: Shift): void => {
+  if (zone.triggerSkip && zone.triggerSkip.includes(shift.role)) {
+    Shift.skipNextTurn(shift);
   }
 };
 
 // REASSIGN
 type ReassignPatient = (draft: Board, eventId: BoardEventId, newShiftId: ShiftId) => Board;
-
-const reassignPatient = Undo.produce((draft, eventId, newShiftId) => {
+const reassignPatient = Undo.produce((draft: Board, eventId: BoardEventId, newShiftId: ShiftId) => {
   const event = draft.events[eventId];
   validateEvent(event);
 
   const newShift = draft.shifts[newShiftId];
-  Shift.adjustCount(draft, newShiftId, event.patient?.mode!, 1);
-
+  Shift.addPatient(newShift, event.patient!);
   const shift = draft.shifts[event.shift!];
-  Shift.adjustCount(draft, shift.id, event.patient?.mode!, -1);
+  Shift.removePatient(shift, event.patient!);
 
   updateEventTypeAndMessage(event, newShift);
+  const supervisorShift = handleSupervisorOnReassign(newShift, shift, event);
 
-  const supervisorShift = handleSupervisorOnReassign(draft, newShift, shift, event);
-
-  return createEventParams(event, newShift, supervisorShift);
+  return createAssignEventParams(newShift, supervisorShift, event.patient!);
 }) as ReassignPatient;
 
-function validateEvent(event) {
+function validateEvent(event: BoardEvent) {
   if (!event.patient) {
     throw new Error(`Error: event: ${event.id} has no patient property.`);
   }
@@ -121,32 +120,21 @@ function validateEvent(event) {
   }
 }
 
-const updateEventTypeAndMessage = (event, newShift) => {
+const updateEventTypeAndMessage = (event: BoardEvent, newShift: Shift) => {
   const newProvider = newShift.provider;
   event.type = "reassign";
   event.message = `Reassigned to: ${newProvider.first} ${newProvider.last}`;
 };
 
-const handleSupervisorOnReassign = (draft, newShift, shift, event) => {
+const handleSupervisorOnReassign = (newShift: Shift, shift: Shift, event: BoardEvent) => {
   if (newShift.role !== "physician" && shift.role === "physician") {
-    Shift.adjustCount(draft, shift.id, "supervisor", 1);
+    Shift.addSupervisor(shift);
     return shift.id;
   }
   if (newShift.role !== "physician" && shift.role !== "physician") {
     return event.supervisorShift;
   }
-  return null;
-};
-
-const createEventParams = (event, newShift, supervisorShift) => {
-  const newProvider = newShift.provider;
-  return {
-    type: "assign",
-    shift: newShift.id,
-    supervisorShift,
-    patient: event.patient,
-    message: `Room ${event.patient.room} assigned to ${newProvider.first} ${newProvider.last}`,
-  };
+  return undefined;
 };
 
 export default {

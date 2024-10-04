@@ -1,4 +1,5 @@
 import ShortUniqueId from "short-unique-id";
+import { getMountainTime } from "./dates";
 const uid = new ShortUniqueId({ length: 6 });
 
 const EVENT_LIMIT = 3;
@@ -43,18 +44,6 @@ const addPatches = (draft: any, eventId: BoardEventId, patches: any[]): Board =>
   draft.events[eventId].inversePatches = patches;
   return draft;
 };
-
-// HELPER
-function getMountainTime(): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "America/Denver",
-    hour12: false,
-  } as Intl.DateTimeFormatOptions);
-
-  return formatter.format(new Date());
-}
 
 export default {
   make,

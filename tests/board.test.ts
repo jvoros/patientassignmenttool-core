@@ -64,13 +64,13 @@ describe("# Board Tests", () => {
       expect(newNewBoard.zones.off.shifts.includes("one")).toBe(true);
     });
   });
-  describe("moveActive()", () => {
+  describe("advanceRotation()", () => {
     it("should move active staff forward and back in rotation", () => {
-      const newBoard = Board.moveActive(board, "main", "patient", -1);
+      const newBoard = Board.advanceRotation(board, "main", "patient", -1);
       expect(newBoard.zones.main.active.patient).toBe("two");
     });
     it("should move active patient forward and back in rotation", () => {
-      const newBoard = Board.moveActive(board, "main", "patient", 1);
+      const newBoard = Board.advanceRotation(board, "main", "patient", 1);
       expect(newBoard.zones.main.active.patient).toBe("two");
     });
   });
@@ -78,6 +78,19 @@ describe("# Board Tests", () => {
     it("should move shifts forward and back in zone", () => {
       const newBoard = Board.changePosition(board, "main", "one", 1);
       expect(newBoard.zones.main.shifts[0]).toBe("one");
+    });
+  });
+  describe("pauseShift()", () => {
+    it("should pause a shift", () => {
+      const newBoard = Board.pauseShift(board, "one");
+      expect(newBoard.shifts.one.skip).toBe(100);
+    });
+  });
+  describe("unpauseShift()", () => {
+    it("should resume a paused shift", () => {
+      const baseBoard = Board.pauseShift(board, "one");
+      const newBoard = Board.unpauseShift(baseBoard, "one");
+      expect(newBoard.shifts.one.skip).toBe(0);
     });
   });
 });

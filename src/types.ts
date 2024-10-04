@@ -57,12 +57,15 @@ type Zone = {
   name: string;
   type: string;
   superFrom?: ZoneId;
+  triggerSkip?: string[]; // type Role
   active: {
     patient: ShiftId | undefined;
     supervisor: ShiftId | undefined;
   };
   shifts: ShiftId[];
 };
+
+type ActiveKey = "patient" | "supervisor";
 
 // SHIFTS
 
@@ -71,6 +74,7 @@ type Shift = {
   name: string;
   role: string;
   bonus: number;
+  skip: number;
   provider: Provider;
   counts: {
     [ptType: string]: number;
@@ -104,9 +108,9 @@ type EventMakeParams = {
   type: string;
   message?: string;
   detail?: string;
-  patient?: { room: string; mode: string };
-  shift?: ShiftId;
-  supervisorShift?: ShiftId;
+  patient?: { room: string; mode: string } | undefined;
+  shift?: ShiftId | undefined;
+  supervisorShift?: ShiftId | undefined;
 };
 
 // LOG
