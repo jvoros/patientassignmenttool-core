@@ -60,7 +60,7 @@ const checkForLastSupervisorError = (draft: Board, zoneId: ZoneId, shiftId: Shif
 
 const setActivesOnLeave = (draft: Board, zoneId: ZoneId, shiftId: ShiftId): void => {
   const { active } = draft.zones[zoneId];
-  Object.keys(active).forEach((key) => {
+  (Object.keys(active) as (keyof typeof active)[]).forEach((key) => {
     if (active[key] === shiftId) {
       advanceRotation(draft, zoneId, key);
     }

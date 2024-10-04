@@ -131,19 +131,21 @@ type AdvanceRotation = (
   whichActive: string,
   direction: number
 ) => Board;
-const advanceRotation = Undo.produce((draft, zoneId, whichActive, direction) => {
-  Zone.advanceRotation(draft, zoneId, whichActive, direction);
-  // event
-  const dir = direction === 1 ? "forward to" : "back to";
-  const active = getActiveMessage(whichActive);
-  const affectedShiftId = draft.zones[zoneId].active[whichActive];
-  const { last, first } = draft.shifts[affectedShiftId].provider;
-  const eventParams = {
-    type: "advanceRotation",
-    message: `${active} moved ${dir} ${first} ${last}.`,
-  };
-  return eventParams;
-}) as AdvanceRotation;
+const advanceRotation = Undo.produce(
+  (draft, zoneId, whichActive: "patient" | "supervisor", direction) => {
+    Zone.advanceRotation(draft, zoneId, whichActive, direction);
+    // event
+    const dir = direction === 1 ? "forward to" : "back to";
+    const active = getActiveMessage(whichActive);
+    const affectedShiftId = draft.zones[zoneId].active[whichActive];
+    const { last, first } = draft.shifts[affectedShiftId!].provider;
+    const eventParams = {
+      type: "advanceRotation",
+      message: `${active} moved ${dir} ${first} ${last}.`,
+    };
+    return eventParams;
+  }
+) as AdvanceRotation;
 
 const getActiveMessage = (whichActive: string): string => {
   return whichActive === "supervisor"
