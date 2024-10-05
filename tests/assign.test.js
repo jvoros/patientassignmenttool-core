@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import Assign from "../src/assign";
 import Board from "../src/board";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 describe("assignToShift()", () => {
   it("should increase count of shift", () => {

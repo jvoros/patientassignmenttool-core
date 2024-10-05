@@ -1,4 +1,4 @@
-import Shift from "./shift";
+import Shift from "./shift.js";
 
 // MAKE
 const make = (zoneParams: { id: string; name: string; type: string; superFrom: ZoneId }): Zone => {

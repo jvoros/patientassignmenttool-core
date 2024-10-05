@@ -1,6 +1,6 @@
-import Shift from "./shift";
-import Zone from "./zone";
-import Undo from "./undo";
+import Shift from "./shift.js";
+import Zone from "./zone.js";
+import Undo from "./undo.js";
 
 // ASSIGN
 type AssignToShift = (draft: Board, zoneId: ZoneId, shiftId: ShiftId, patient: Patient) => Board;

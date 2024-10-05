@@ -42,7 +42,9 @@ The `site` object is the static info related to the site: providers, schedule an
 
 The `board` object is the current state of that site. The `events` array can be limited to `site.event_limit`.
 
-[Sample Board](./sampleboard.js)
+[Sample Site Document](./dummy/siteDocumentFromMongo.json)
+
+[Sample Board](./dummy/sampleboard.js)
 
 ## Logs
 

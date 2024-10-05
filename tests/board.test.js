@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Board from "../src/board";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 describe("# Board Tests", () => {
   describe("reset()", () => {

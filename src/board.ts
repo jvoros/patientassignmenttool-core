@@ -1,8 +1,8 @@
-import Shift from "./shift";
-import Zone from "./zone";
-import Undo from "./undo";
-import Assign from "./assign";
-import { getMountainTimeDateString } from "./dates";
+import Shift from "./shift.js";
+import Zone from "./zone.js";
+import Undo from "./undo.js";
+import Assign from "./assign.js";
+import { getMountainTimeDateString } from "./dates.js";
 
 // RESET
 type Reset = (draft: Board) => Board;

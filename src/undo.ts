@@ -1,5 +1,5 @@
 import { produce, produceWithPatches, enablePatches, applyPatches } from "immer";
-import Event from "./event";
+import Event from "./event.js";
 enablePatches();
 
 // produceWithUndo()
@@ -20,7 +20,7 @@ enablePatches();
 
 const produceWithUndo =
   (recipeFn: RecipeWithEvent) =>
-  (board: Board, ...args) => {
+  (board: Board, ...args: any[]) => {
     const recipeWithEvent = (draft: Board) => {
       const eventParams = recipeFn(draft, ...args);
       Event.add(draft, eventParams);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Zone from "../src/zone";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 describe("# Zone Functions", () => {
   describe("make()", () => {

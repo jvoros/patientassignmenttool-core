@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Shift from "../src/shift";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 describe("# Shift Tests", () => {
   describe("make()", () => {

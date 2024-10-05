@@ -6,8 +6,9 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "tsc": "tsc",
-    "db": "node dist/index.js"
+    "tsc": "tsc -w",
+    "db": "NODE_ENV=development node --env-file=.dev.env ./dist/index.js",
+    "runtest": "NODE_ENV=test node --env-file=.dev.env ./runtest.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,7 +19,7 @@
   },
   "dependencies": {
     "immer": "^10.1.1",
-    "mongodb": "6.3.0",
+    "mongodb": "^6.9.0",
     "short-unique-id": "^5.2.0"
   }
 }

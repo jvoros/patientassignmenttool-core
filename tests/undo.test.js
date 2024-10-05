@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import Board from "../src/board";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 // if undo() works then so does produceWithUndo()
 describe("undo()", () => {

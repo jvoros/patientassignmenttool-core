@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Event from "../src/event";
-import board from "../sampleboard";
+import board from "../dummy/sampleboard";
 
 const options = {
   type: "assign",
