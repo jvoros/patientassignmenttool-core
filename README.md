@@ -1,27 +1,31 @@
-# Immer and Mongo FTW
+# Patient Assignment Tool v1.0
 
 This is it. I think the best architectural solution to this app. We don't need any classes. We don't need complex SQL table setups. The app has always worked well as a JSON state object passed between server and client.
 
-The functional approach became cumbersome because of all the parameters that had to be passed to each function that dealt with some subpart of the state.
+### Prior Approaches
 
-The OOP approach became cumbersome because of all the scaffolding required just to run a few methods.
+The functional approach became cumbersome because of all the parameters that had to be passed to each function that dealt with some subpart of the state. And then modifying deeply nested objects in an immutable way also became complicated and hard to keep track of which functions worked in place as helpers and which functions had the responsibility to return new state.
 
-All along the state object always had all the info present. So if we are going to pass state in to every function, why not use [Immer](https://immerjs.github.io/) to make that easy? Well, if you use Immer, you also get [patches](https://immerjs.github.io/immer/patches)!
+The OOP approach became cumbersome because of all the scaffolding required just to run a few methods. The methods were simple, with short names and minimal parameters, because the object held the state. But it was very hard to test. And all the state the objects stored had to be turned into JSON to send to client anyway.
 
-This means we can just store the `inversePatches` necessary to undo any event. This makes implementing undos trivial. This also makes the state object waaaaaaay smaller than holding the entire state in each event.
+### Immer FTW
 
-Now the workflow is:
+[Immer](https://immerjs.github.io/) splits the difference between the two. The state/board object always had all the info present. Immer makes it very easy to modify the state/board object in place and return a new state object.
+
+Using Immer, you also get [patches](https://immerjs.github.io/immer/patches)! We can just store the `inversePatches` necessary to undo any event. This makes implementing undos trivial. This also makes the state object waaaaaaay smaller than holding the entire state in each event.
+
+## App Flow in this Version
 
 1. On startup, server gets site from database.
 2. Server broadcasts site.board to all clients.
 3. Client sends action to server.
 4. Server uses Immer to make newBoard by applying action, and adding Event (without `inversePatches`).
-5. Server saves the inversePatches from the action in step 4.
-6. Server adds inversePatches to Event on board.
-7. Server sends newBoard to Mongo to update `Site.board`.
-8. On success from Mongo, Server broadcasts newBoard, from memory, to all clients.
+5. Server adds the `inversePatches` to Event on board.
+6. Server sends newBoard back to client.
 
-There is one request from client to server. One request from server to DB. One response from server to all clients.
+- This app has worked for 18 months in production as just with just the server-side in-memory store. We don't need to wait for confirmation from server that data was saved in database. The database is just a backup persistence layer.
+
+7. Server simultaneously sends newBoard to Mongo to update `Site.board`.
 
 Everything is simplified.
 
@@ -29,10 +33,10 @@ To undo an event:
 
 1. remove the first event in array
 2. remove inversePatches from first event in array
-3. _now board is equivalent to state produced by these patches_
+3. _now the board is equivalent to the state immediately after these patches were applied_
 4. apply inversePatches
-5. send to Mongo to update `Site.board`
-6. broadcast to clients
+5. broadcast to clients
+6. send to Mongo to update `Site.board`
 
 ## Sample Site Document
 
