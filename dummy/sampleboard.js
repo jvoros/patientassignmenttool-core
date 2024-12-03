@@ -5,7 +5,7 @@ export default {
     off: {
       id: "off",
       name: "Off",
-      type: "list",
+      type: "zone",
       active: { patient: undefined, supervisor: undefined },
       shifts: ["four"],
     },

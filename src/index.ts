@@ -69,7 +69,7 @@ const createBoardStore = (site: string) => {
             console.error("Failed to update database");
           }
         });
-        return { success: false, board: newBoard };
+        return { success: true, board: newBoard };
       } catch (err) {
         console.error(err);
         return { success: false, error: err };

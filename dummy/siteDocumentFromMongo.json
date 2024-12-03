@@ -65,7 +65,7 @@
       "off": {
         "id": "off",
         "name": "Off",
-        "type": "list",
+        "type": "zone",
         "active": {
           "patient": null,
           "supervisor": null

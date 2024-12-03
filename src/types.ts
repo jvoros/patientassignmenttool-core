@@ -47,6 +47,9 @@ type Board = {
 // rotation: adds at up next index, can move who is up next
 // rotation_super: rotation, but also has supervisor
 // any zone can get a supervisor from another zone
+// triggerSkip: array of roles that trigger skip
+//    if triggerSkip is 'app' then assignment in this zone will
+//    trigger a skip in any other rotation zone that shift is also in
 
 type ZoneType = "zone" | "zone_patient" | "rotation" | "rotation_super";
 
@@ -57,7 +60,7 @@ type Zone = {
   name: string;
   type: string;
   superFrom?: ZoneId;
-  triggerSkip?: string[]; // type Role
+  triggerSkip?: string[]; // type Role,
   active: {
     patient: ShiftId | undefined;
     supervisor: ShiftId | undefined;
