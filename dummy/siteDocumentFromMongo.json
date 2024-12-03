@@ -2,6 +2,7 @@
   "_id": "67008d2ae4d5f0a5abec4fe6",
   "site": "stmarks",
   "details": {
+    "name": "St. Mark's Hospital",
     "providers": [
       {
         "last": "Voros",
@@ -57,7 +58,47 @@
         "type": "zone"
       }
     ],
-    "name": "St. Mark's Hospital"
+    "rooms": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "27",
+      "28",
+      "29",
+      "30",
+      "Tr A",
+      "Tr B",
+      "Tr C",
+      "Hall A",
+      "Hall B",
+      "Hall C",
+      "Hall D",
+      "Hall E",
+      "Hall F",
+      "Other"
+    ]
   },
   "board": {
     "date": "2021-09-01",

@@ -93,6 +93,8 @@ type Patient = {
   mode: string;
 };
 
+type mode = "walkin" | "ft" | "ambo" | "police";
+
 type BoardEventId = BoardEvent["id"];
 
 type BoardEvent = {

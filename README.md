@@ -252,9 +252,13 @@ type Patient = {
   room: string;
   mode: string;
 };
+
+type mode = "walkin" | "ft" | "ambo" | "police";
 ```
 
 Assigns a patient to a specified shift. This is not part of any rotation. If the assignment also requires a supervisor assignment, that will also be triggered. This will create an event for the assignment.
+
+`room` should come from the `site.details` and be configured on a sitewide basis.
 
 ---
 
@@ -269,6 +273,8 @@ type Patient = {
   room: string;
   mode: string;
 };
+
+type mode = "walkin" | "ft" | "ambo" | "police";
 ```
 
 Assigns a patient according to the rotation. Whichever shift is set as active will have the patient assigned to it. The rotation will advance, or not, depending on the shift bonus, skip and other internal flags.
