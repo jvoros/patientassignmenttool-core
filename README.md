@@ -69,7 +69,19 @@ These will be added to database when reset to start a new day. No point in loggi
 
 # API
 
+Build the core js files from ts source into dist folder and copy to your project.
+
+```
+npm run build
+```
+
+Don't forget to include `MONGO_URI` connection string in `.env` and include it in your deploy routines.
+
 ## Board Functions
+
+```js
+import createBoardStore from "../path/to/module/index.js";
+```
 
 ### # createBoardStore()
 
