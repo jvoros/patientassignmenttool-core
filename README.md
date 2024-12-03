@@ -71,7 +71,7 @@ These will be added to database when reset to start a new day. No point in loggi
 
 ## Board Functions
 
-### createBoardStore()
+### # createBoardStore()
 
 ```ts
 function createBoardStore(siteName: string);
@@ -87,7 +87,7 @@ Initializes the module. All following API calls are methods on the `board`, e.g 
 
 ---
 
-### getBoard()
+### # getBoard()
 
 ```ts
 function getBoard(): Board;
@@ -97,7 +97,7 @@ Returns just the `board` portion of the the `site` document from memory, if alre
 
 ---
 
-### getSiteComplete()
+### # getSiteComplete()
 
 ```ts
 function getSiteComplete(): SiteDocument;
@@ -107,7 +107,7 @@ Returns the complete `site` document from the database.
 
 ---
 
-### getSiteDetails()
+### # getSiteDetails()
 
 ```ts
 function getSiteDetails(): SiteDetails;
@@ -117,7 +117,7 @@ Returns just the `details` portion from the `site` document. `details` includes 
 
 ---
 
-### boardReset()
+### # boardReset()
 
 ```ts
 function boardReset(): Board;
@@ -127,7 +127,9 @@ Returns an empty board and saves the previous board logs to the database.
 
 ---
 
-### signIn()
+## Shift Functions
+
+### # signIn()
 
 ```ts
 function signIn(provider: Provider, scheduleItem: ScheduleItem): Board;
@@ -153,7 +155,7 @@ Adds a shift to the board. Will add the shift to the zones specified in `joinZon
 
 ---
 
-### signOut()
+### # signOut()
 
 ```ts
 function signOut(shiftId: ShiftId): Board;
@@ -163,7 +165,7 @@ Signs out the specified shift.
 
 ---
 
-### joinZone()
+### # joinZone()
 
 ```ts
 function joinZone(zoneId: ZoneId, shiftId: ShiftId): Board;
@@ -173,7 +175,7 @@ Adds the specified shift to the specified zone.
 
 ---
 
-### leaveZone()
+### # leaveZone()
 
 ```ts
 function leaveZone(zoneId: ZoneId, shiftId: ShiftId): Board;
@@ -183,7 +185,7 @@ Removes the specified shift from the specified zone.
 
 ---
 
-### switchZone()
+### # switchZone()
 
 ```ts
 function switchZone(leaveZoneId: ZoneId, joinZoneId: ZoneId, shiftId: ShiftId): Board;
@@ -193,7 +195,9 @@ Moves the specified shift between the specified zones.
 
 ---
 
-### advanceRotation()
+## Zone Functions
+
+### # advanceRotation()
 
 ```ts
 function advanceRotation = (zoneId: ZoneId, whichActive: string, direction: number
@@ -204,7 +208,7 @@ Changes which shift is set to the active shift in the rotation. `whichActive` is
 
 ---
 
-### changePosition()
+### # changePosition()
 
 ```ts
 function changePosition = (zone: ZoneId, shift: ShiftId, direction: number): Board;
@@ -215,7 +219,7 @@ Adjusts the order of shifts in a rotation. `direction` will usually be `1` to mo
 
 ---
 
-### pauseShift()
+### # pauseShift()
 
 ```ts
 function pauseShift(shiftId: ShiftId): Board;
@@ -225,7 +229,7 @@ Pauses a shift in rotation, so the shift will be skipped everytime through rotat
 
 ---
 
-### unpauseShift()
+### # unpauseShift()
 
 ```ts
 function unpauseShift(shiftId: ShiftId): Board;
@@ -235,7 +239,9 @@ Unpauses a shift that is currently paused. Once unpaused, shift will again becom
 
 ---
 
-### assignToShift()
+## Assignment Functions
+
+### # assignToShift()
 
 ```ts
 function assignToShift(zoneId: ZoneId, shiftId: ShiftId, patient: Patient): Board;
@@ -252,7 +258,7 @@ Assigns a patient to a specified shift. This is not part of any rotation. If the
 
 ---
 
-### assignToZone()
+### # assignToZone()
 
 ```ts
 function assignToZone(zoneId: ZoneId, patient: Patient): Board;
@@ -271,7 +277,7 @@ One notable flag is the `triggerSkip` flag for a shift. For example, the Fast Tr
 
 ---
 
-### reassignPatient()
+### # reassignPatient()
 
 ```ts
 function reassignPatient(eventId: BoardEventId, newShiftId: ShiftId): Board;
