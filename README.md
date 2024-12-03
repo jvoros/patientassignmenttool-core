@@ -66,3 +66,221 @@ These will be added to database when reset to start a new day. No point in loggi
   "bounty": 0
 }
 ```
+
+# API
+
+## Board Functions
+
+### createBoardStore()
+
+```ts
+function createBoardStore(siteName: string);
+```
+
+Example initialization:
+
+```js
+const board = createBoardStore("stmarks");
+```
+
+Initializes the module. All following API calls are methods on the `board`, e.g `board.getBoard()`.
+
+---
+
+### getBoard()
+
+```ts
+function getBoard(): Board;
+```
+
+Returns just the `board` portion of the the `site` document from memory, if already instantiated, or from the database if first connection.
+
+---
+
+### getSiteComplete()
+
+```ts
+function getSiteComplete(): SiteDocument;
+```
+
+Returns the complete `site` document from the database.
+
+---
+
+### getSiteDetails()
+
+```ts
+function getSiteDetails(): SiteDetails;
+```
+
+Returns just the `details` portion from the `site` document. `details` includes a list of `providers`, `schedule` - a list of daily shifts for the site, and `zones` - enough info to configure the zone.
+
+---
+
+### boardReset()
+
+```ts
+function boardReset(): Board;
+```
+
+Returns an empty board and saves the previous board logs to the database.
+
+---
+
+### signIn()
+
+```ts
+function signIn(provider: Provider, scheduleItem: ScheduleItem): Board;
+```
+
+```ts
+type Provider = {
+  last: string;
+  first: string;
+};
+
+type Role = "physician" | "app" | "resident";
+
+type ScheduleItem = {
+  name: string;
+  role: string;
+  bonus: number;
+  joinZones: ZoneId[];
+};
+```
+
+Adds a shift to the board. Will add the shift to the zones specified in `joinZones`. The `ScheduleItem` object is configured in the `site` document and should come from there, not be hand configured.
+
+---
+
+### signOut()
+
+```ts
+function signOut(shiftId: ShiftId): Board;
+```
+
+Signs out the specified shift.
+
+---
+
+### joinZone()
+
+```ts
+function joinZone(zoneId: ZoneId, shiftId: ShiftId): Board;
+```
+
+Adds the specified shift to the specified zone.
+
+---
+
+### leaveZone()
+
+```ts
+function leaveZone(zoneId: ZoneId, shiftId: ShiftId): Board;
+```
+
+Removes the specified shift from the specified zone.
+
+---
+
+### switchZone()
+
+```ts
+function switchZone(leaveZoneId: ZoneId, joinZoneId: ZoneId, shiftId: ShiftId): Board;
+```
+
+Moves the specified shift between the specified zones.
+
+---
+
+### advanceRotation()
+
+```ts
+function advanceRotation = (zoneId: ZoneId, whichActive: string, direction: number
+): Board;
+```
+
+Changes which shift is set to the active shift in the rotation. `whichActive` is `patient` or `supervisor` to specify which role in the rotation needs to be adjusted. `direction` will almost always be `1` to specify advancing forward or `-1` to specify moving backward in rotation.
+
+---
+
+### changePosition()
+
+```ts
+function changePosition = (zone: ZoneId, shift: ShiftId, direction: number): Board;
+
+```
+
+Adjusts the order of shifts in a rotation. `direction` will usually be `1` to move the shift forward in rotation, or `-1` to move the shift backward in the rotation.
+
+---
+
+### pauseShift()
+
+```ts
+function pauseShift(shiftId: ShiftId): Board;
+```
+
+Pauses a shift in rotation, so the shift will be skipped everytime through rotation until the shift is unpaused.
+
+---
+
+### unpauseShift()
+
+```ts
+function unpauseShift(shiftId: ShiftId): Board;
+```
+
+Unpauses a shift that is currently paused. Once unpaused, shift will again become active in the rotation.
+
+---
+
+### assignToShift()
+
+```ts
+function assignToShift(zoneId: ZoneId, shiftId: ShiftId, patient: Patient): Board;
+```
+
+```ts
+type Patient = {
+  room: string;
+  mode: string;
+};
+```
+
+Assigns a patient to a specified shift. This is not part of any rotation. If the assignment also requires a supervisor assignment, that will also be triggered. This will create an event for the assignment.
+
+---
+
+### assignToZone()
+
+```ts
+function assignToZone(zoneId: ZoneId, patient: Patient): Board;
+```
+
+```ts
+type Patient = {
+  room: string;
+  mode: string;
+};
+```
+
+Assigns a patient according to the rotation. Whichever shift is set as active will have the patient assigned to it. The rotation will advance, or not, depending on the shift bonus, skip and other internal flags.
+
+One notable flag is the `triggerSkip` flag for a shift. For example, the Fast Track Zone may be set up so when a patient is assigned to a shift in Fast Track, it will trigger a skip, for any other rotations that shift may also be in. The `triggerSkip` flag is configured in the `site.details` configuration.
+
+---
+
+### reassignPatient()
+
+```ts
+function reassignPatient(eventId: BoardEventId, newShiftId: ShiftId): Board;
+```
+
+Handles all the logic to reassign a patient.
+
+If a patient was initially assigned to a physician and is reassigned to an APP, the original physician will be set as supervisor.
+
+If a patient was initially assigned to an APP and is reassigned to another APP, the original supervisor will stay set as the supervisor.
+
+---

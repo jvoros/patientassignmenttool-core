@@ -7,6 +7,7 @@
   "scripts": {
     "test": "vitest",
     "tsc": "tsc -w",
+    "build": "tsc",
     "db": "NODE_ENV=development node --env-file=.dev.env ./dist/index.js",
     "runtest": "NODE_ENV=test node --env-file=.dev.env ./runtest.js"
   },
