@@ -1,7 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-const createDbConnection = (): any => {
-  const client = new MongoClient(process.env.MONGO_URI!, {
+const createDbConnection = (mongoUri: string): any => {
+  const client = new MongoClient(mongoUri, {
     serverApi: {
       version: ServerApiVersion.v1,
       strict: true,

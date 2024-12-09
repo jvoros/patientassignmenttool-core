@@ -3,8 +3,8 @@ import createDbConnection from "./db.js";
 
 // BOARD STORE
 
-const createBoardStore = (site: string) => {
-  const db = createDbConnection();
+const createBoardStore = (site: string, mongoUri: string) => {
+  const db = createDbConnection(mongoUri);
   let board: Board;
 
   const getBoard = async () => {
