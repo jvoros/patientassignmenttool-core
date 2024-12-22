@@ -72,6 +72,7 @@ const createBoardStore = (siteName: string, mongoUri: string) => {
     async (...args: any[]) => {
       try {
         const newBoard = fn(await getBoard(), ...args);
+        board = newBoard;
         // don't need to wait on database to update
         // start promise and return immediately
         db.updateBoard(site, newBoard).then((result: any) => {
