@@ -2,7 +2,7 @@ import ShortUniqueId from "short-unique-id";
 import { getMountainTime } from "./dates.js";
 const uid = new ShortUniqueId({ length: 6 });
 
-const EVENT_LIMIT = 3;
+const EVENT_LIMIT = 25;
 
 const make = (options: EventMakeParams): BoardEvent => {
   return { id: uid.rnd(), time: getMountainTime(), inversePatches: [], ...options };
