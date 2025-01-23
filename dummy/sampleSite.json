@@ -41,11 +41,13 @@
     "zones": [
       {
         "id": "main",
+        "order": 10,
         "name": "Main",
         "type": "rotation_super"
       },
       {
         "id": "fasttrack",
+        "order": 20,
         "name": "Fast Track",
         "type": "zone_patient",
         "superFrom": "main"
@@ -69,6 +71,7 @@
       },
       "main": {
         "id": "main",
+        "order": 10,
         "name": "Main",
         "type": "rotation_super",
         "active": {
@@ -79,6 +82,7 @@
       },
       "fasttrack": {
         "id": "fasttrack",
+        "order": 20,
         "name": "Fast Track",
         "type": "zone_patient",
         "superFrom": "main",
