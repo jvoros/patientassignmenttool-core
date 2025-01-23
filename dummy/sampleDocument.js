@@ -15,9 +15,9 @@ export default {
       { name: "8a - 5p", bonus: 2, joinZones: ["main"], role: "physician" },
     ],
     zones: [
-      { id: "main", name: "Main", type: "rotation_super" },
-      { id: "fasttrack", name: "Fast Track", type: "zone_patient", superFrom: "main" },
-      { id: "off", name: "Off Service", type: "zone" },
+      { id: "main", order: 10, name: "Main", type: "rotation_super" },
+      { id: "fasttrack", order: 20, name: "Fast Track", type: "zone_patient", superFrom: "main" },
+      { id: "off", order: 0, name: "Off Service", type: "zone" },
     ],
   },
   board: board,

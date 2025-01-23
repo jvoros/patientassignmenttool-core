@@ -1,7 +1,13 @@
 import Shift from "./shift.js";
 
 // MAKE
-const make = (zoneParams: { id: string; name: string; type: string; superFrom: ZoneId }): Zone => {
+const make = (zoneParams: {
+  id: string;
+  order: number;
+  name: string;
+  type: string;
+  superFrom: ZoneId;
+}): Zone => {
   return { ...zoneParams, active: { patient: undefined, supervisor: undefined }, shifts: [] };
 };
 

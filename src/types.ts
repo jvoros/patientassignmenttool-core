@@ -57,6 +57,7 @@ type ZoneId = Zone["id"];
 
 type Zone = {
   id: string;
+  order: number; // order of zones in the board, 10-19 main column, 20-29 secondary column
   name: string;
   type: string;
   superFrom?: ZoneId;
