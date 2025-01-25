@@ -52,7 +52,7 @@ type Board = {
 //    if triggerSkip is 'app' then assignment in this zone will
 //    trigger a skip in any other rotation zone that shift is also in
 
-type ZoneType = "zone" | "zone_patient" | "rotation" | "rotation_super";
+type ZoneType = "zone" | "zone_patient" | "ft_zone_patient" | "rotation" | "rotation_super";
 
 type ZoneId = Zone["id"];
 
