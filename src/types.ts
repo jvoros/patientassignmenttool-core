@@ -44,6 +44,7 @@ type Board = {
 // ZONE TYPES
 // zone: just a list of shifts
 // zone_patient: list of shifts, first shift always up next
+// ft_zone_patient: same as zone_patient but also indicate fast track
 // rotation: adds at up next index, can move who is up next
 // rotation_super: rotation, but also has supervisor
 // any zone can get a supervisor from another zone
