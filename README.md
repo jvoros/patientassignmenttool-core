@@ -212,8 +212,7 @@ Moves the specified shift between the specified zones.
 ### # advanceRotation()
 
 ```ts
-function advanceRotation = (zoneId: ZoneId, whichActive: string, direction: number
-): Board;
+function advanceRotation = (zoneId: ZoneId, whichActive: string, direction: number): Board;
 ```
 
 Changes which shift is set to the active shift in the rotation. `whichActive` is `patient` or `supervisor` to specify which role in the rotation needs to be adjusted. `direction` will almost always be `1` to specify advancing forward or `-1` to specify moving backward in rotation.

@@ -4,37 +4,104 @@
   "details": {
     "name": "St. Mark's Hospital",
     "providers": [
-      {
-        "last": "Voros",
-        "first": "Jeremy",
-        "role": "physician"
-      },
-      {
-        "last": "Blake",
-        "first": "Kelly",
-        "role": "physician"
-      },
-      {
-        "last": "Cheever",
-        "first": "Shelley",
-        "role": "app"
-      }
+      { "last": "Baretela", "first": "Tracie", "role": "app" },
+      { "last": "Blake", "first": "Kelly", "role": "physician" },
+      { "last": "Bolin", "first": "Morgan", "role": "app" },
+      { "last": "Bown", "first": "Deanna", "role": "app" },
+      { "last": "Carmack", "first": "Brian", "role": "physician" },
+      { "last": "Cheever", "first": "Shelley", "role": "app" },
+      { "last": "Christensen", "first": "Mark", "role": "physician" },
+      { "last": "Conca", "first": "Rocco", "role": "app" },
+      { "last": "Cross", "first": "Taylor", "role": "app" },
+      { "last": "Dastrup", "first": "Brigham", "role": "physician" },
+      { "last": "DeWeerd", "first": "Pete", "role": "physician" },
+      { "last": "Denson", "first": "Dave", "role": "physician" },
+      { "last": "Erbach", "first": "Craig", "role": "physician" },
+      { "last": "Eller", "first": "Dave", "role": "physician" },
+      { "last": "Fox", "first": "Julie", "role": "physician" },
+      { "last": "Grahlfs", "first": "Phil", "role": "physician" },
+      { "last": "Hama", "first": "Erinn", "role": "physician" },
+      { "last": "Hardin", "first": "Jeff", "role": "physician" },
+      { "last": "Hart", "first": "Mike", "role": "physician" },
+      { "last": "Heinlein", "first": "Danielle", "role": "app" },
+      { "last": "Hollifield", "first": "Matt", "role": "physician" },
+      { "last": "Kamba", "first": "Patrick", "role": "physician" },
+      { "last": "Kasavana", "first": "Brian", "role": "app" },
+      { "last": "Lawyer", "first": "Thomas", "role": "physician" },
+      { "last": "Lemon", "first": "Anthon", "role": "physician" },
+      { "last": "Lempit", "first": "Hilary", "role": "app" },
+      { "last": "Li", "first": "Helen", "role": "physician" },
+      { "last": "Merchant", "first": "Azher", "role": "physician" },
+      { "last": "Mooth", "first": "Steve", "role": "physician" },
+      { "last": "Mueller", "first": "Trent", "role": "physician" },
+      { "last": "Nicolai", "first": "Rachelle", "role": "physician" },
+      { "last": "Oleskey", "first": "Zac", "role": "physician" },
+      { "last": "Paradise", "first": "Mark", "role": "physician" },
+      { "last": "Park", "first": "Tammy", "role": "physician" },
+      { "last": "Porter", "first": "Jacob", "role": "physician" },
+      { "last": "Raborn", "first": "Laurie", "role": "physician" },
+      { "last": "Rogers", "first": "Legrand", "role": "physician" },
+      { "last": "Shaw", "first": "Tyler", "role": "app" },
+      { "last": "Shumway", "first": "Jordan", "role": "app" },
+      { "last": "Stevens", "first": "Mark", "role": "physician" },
+      { "last": "Stiles", "first": "Adam", "role": "physician" },
+      { "last": "Voros", "first": "Jeremy", "role": "physician" },
+      { "last": "Wiesley", "first": "Brett", "role": "physician" },
+      { "last": "Yeates", "first": "Todd", "role": "physician" },
+      { "last": "Doc", "first": "Not Listed", "role": "physician" },
+      { "last": "APP", "first": "Not Listed", "role": "app" }
     ],
     "schedule": [
       {
-        "name": "6a - 3p",
+        "name": "6 am - 3 pm",
         "bonus": 2,
         "joinZones": ["main"],
         "role": "physician"
       },
       {
-        "name": "6a - 3p APP",
+        "name": "6 am - 3 pm APP",
         "bonus": 0,
         "joinZones": ["main", "fasttrack"],
         "role": "app"
       },
       {
-        "name": "8a - 5p",
+        "name": "8 am - 5 pm",
+        "bonus": 2,
+        "joinZones": ["main"],
+        "role": "physician"
+      },
+      {
+        "name": "11 am - 9 pm",
+        "bonus": 2,
+        "joinZones": ["main"],
+        "role": "physician"
+      },
+      {
+        "name": "3 pm - 12 am",
+        "bonus": 2,
+        "joinZones": ["main"],
+        "role": "physician"
+      },
+      {
+        "name": "3 pm - 1 am APP",
+        "bonus": 0,
+        "joinZones": ["fasttrack", "main"],
+        "role": "app"
+      },
+      {
+        "name": "5 pm - 2 am",
+        "bonus": 2,
+        "joinZones": ["main"],
+        "role": "physician"
+      },
+      {
+        "name": "8 pm - 4 am",
+        "bonus": 0,
+        "joinZones": ["fasttrack", "main"],
+        "role": "app"
+      },
+      {
+        "name": "11 pm - 7 am",
         "bonus": 2,
         "joinZones": ["main"],
         "role": "physician"
@@ -43,11 +110,13 @@
     "zones": [
       {
         "id": "main",
+        "order": 10,
         "name": "Main",
         "type": "rotation_super"
       },
       {
         "id": "fasttrack",
+        "order": 20,
         "name": "Fast Track",
         "type": "zone_patient",
         "superFrom": "main"
@@ -101,20 +170,18 @@
     ]
   },
   "board": {
-    "date": "2021-09-01",
+    "date": "09/25/2004",
     "zones": {
       "off": {
         "id": "off",
         "name": "Off",
-        "type": "zone",
-        "active": {
-          "patient": null,
-          "supervisor": null
-        },
+        "type": "list",
+        "active": {},
         "shifts": ["four"]
       },
       "main": {
         "id": "main",
+        "order": 10,
         "name": "Main",
         "type": "rotation_super",
         "active": {
@@ -125,14 +192,12 @@
       },
       "fasttrack": {
         "id": "fasttrack",
+        "order": 20,
         "name": "Fast Track",
         "type": "zone_patient",
         "superFrom": "main",
         "triggerSkip": ["app"],
-        "active": {
-          "patient": null,
-          "supervisor": null
-        },
+        "active": {},
         "shifts": ["three"]
       }
     },
@@ -212,7 +277,7 @@
         "type": "assign",
         "patient": {
           "room": "Tr A",
-          "mode": "ambulance"
+          "mode": "ambo"
         },
         "shift": "three",
         "supervisorShift": "two",
@@ -232,7 +297,7 @@
         "type": "assign",
         "patient": {
           "room": "4",
-          "mode": "ambo"
+          "mode": "walkin"
         },
         "shift": "one",
         "inversePatches": ["immer inversePatches go here"]

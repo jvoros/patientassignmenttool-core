@@ -161,7 +161,7 @@ type ChangePosition = (draft: Board, zone: ZoneId, shift: ShiftId, dir: number) 
 const changePosition = Undo.produce((draft, zoneId, shiftId, dir) => {
   Zone.adjustOrder(draft, zoneId, shiftId, dir);
   // event
-  const direction = dir === 1 ? "up" : "back";
+  const direction = dir === 1 ? "down" : "up";
   const zoneName = draft.zones[zoneId].name;
   const { last, first } = draft.shifts[shiftId].provider;
   const eventParams = {
