@@ -118,7 +118,7 @@
         "id": "fasttrack",
         "order": 20,
         "name": "Fast Track",
-        "type": "zone_patient",
+        "type": "ft_zone_patient",
         "superFrom": "main"
       },
       {
@@ -177,7 +177,7 @@
         "name": "Off",
         "type": "list",
         "active": {},
-        "shifts": ["four"]
+        "shifts": ["four", "five"]
       },
       "main": {
         "id": "main",
@@ -194,7 +194,7 @@
         "id": "fasttrack",
         "order": 20,
         "name": "Fast Track",
-        "type": "zone_patient",
+        "type": "ft_zone_patient",
         "superFrom": "main",
         "triggerSkip": ["app"],
         "active": {},
@@ -204,9 +204,9 @@
     "shifts": {
       "one": {
         "id": "one",
-        "name": "6a-3p",
+        "name": "6 am - 3 pm",
         "role": "physician",
-        "bonus": 2,
+        "bonus": 0,
         "skip": 0,
         "provider": {
           "last": "Voros",
@@ -222,7 +222,7 @@
       },
       "two": {
         "id": "two",
-        "name": "8a-6p",
+        "name": "8 am - 6 pm",
         "role": "physician",
         "bonus": 2,
         "skip": 0,
@@ -234,7 +234,7 @@
       },
       "three": {
         "id": "three",
-        "name": "6a-3p APP",
+        "name": "6 am - 3 pm APP",
         "role": "app",
         "bonus": 0,
         "skip": 0,
@@ -246,7 +246,7 @@
       },
       "four": {
         "id": "four",
-        "name": "3p-11p APP",
+        "name": "3 pm - 11 pm APP",
         "role": "app",
         "bonus": 0,
         "skip": 0,
@@ -258,7 +258,7 @@
       },
       "five": {
         "id": "five",
-        "name": "11a-9p",
+        "name": "11 am- 9 pm",
         "role": "physician",
         "bonus": 2,
         "skip": 0,

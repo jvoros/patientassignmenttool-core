@@ -43,7 +43,15 @@ const createDbConnection = (mongoUri: string): any => {
     await client.connect();
     const database = client.db("pat");
     const collection = database.collection("logs");
-    return await collection.insertMany(logs);
+    return await collection.bulkWrite(
+      logs.map((log) => ({
+        updateOne: {
+          filter: { date: log.date, site: log.site, shift: log.shift },
+          update: { $set: log },
+          upsert: true,
+        },
+      }))
+    );
   };
 
   const tryCatchWrap =

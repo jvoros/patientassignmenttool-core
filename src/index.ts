@@ -40,11 +40,16 @@ const createBoardStore = (siteName: string, mongoUri: string) => {
   // LOGS
 
   const saveLogs = async () => {
-    const result = await db.saveLogs(buildLogs(site, await getBoard()));
-    if (result.insertedCount === 0) {
-      throw new Error("Failed to save logs");
+    try {
+      const result = await db.saveLogs(buildLogs(site, await getBoard()));
+      console.log("saveLogs: ", result);
+      if (result.insertedCount + result.modifiedCount === 0) {
+        throw new Error("Failed to save logs");
+      }
+      return result;
+    } catch (error) {
+      console.log(error);
     }
-    return result;
   };
 
   const getTotalAndSupervised = (shift: Shift): { total: number; supervised: number } => {
