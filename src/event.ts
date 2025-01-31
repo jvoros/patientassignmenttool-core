@@ -2,7 +2,7 @@ import ShortUniqueId from "short-unique-id";
 import { getMountainTime } from "./dates.js";
 const uid = new ShortUniqueId({ length: 6 });
 
-const EVENT_LIMIT = 3;
+const EVENT_LIMIT = parseInt(process.env.DEV_EVENT_LIMIT as string) || 25;
 
 const make = (options: EventMakeParams): BoardEvent => {
   return { id: uid.rnd(), time: getMountainTime(), inversePatches: [], ...options };
@@ -29,11 +29,11 @@ const addReassign = (draft: Board, priorEventId: BoardEventId, newEventId: Board
   const event = draft.events[priorEventId];
   const newShiftId = draft.events[newEventId].shift;
   if (!newShiftId) {
-    throw new Error(`Error: no event.shiftId found for newEventId: ${newEventId}`);
+    throw new Error(`No event.shiftId found for newEventId [${newEventId}]`);
   }
   const newProvider = draft.shifts[newShiftId].provider;
   if (!newProvider) {
-    throw new Error(`Error: no shift found for shiftId: ${newShiftId}`);
+    throw new Error(`No shift found for shiftId [${newShiftId}]`);
   }
   event.message = `Reassigned to: ${newProvider.first} ${newProvider.last}`;
   return draft;

@@ -49,7 +49,7 @@ const getSuperZoneAndShift = (
 ): { superZoneId: ZoneId; superShiftId: ShiftId } => {
   if (!zone.superFrom && !zone.active.supervisor) {
     throw new Error(
-      `Assign Error: zoneId ${zone.id} has no 'superFrom:' property and no active.supervisor is set.`
+      `Assign Error: zoneId [${zone.id}] has no 'superFrom:' property and no active.supervisor is set.`
     );
   }
   // use ! non-null assertion because already checked at least one exists
@@ -79,7 +79,7 @@ const getActiveShift = (draft: Board, zoneId: ZoneId): Shift => {
   const zone = draft.zones[zoneId];
   const shiftId = zone.type.includes("rotation") ? zone.active.patient : zone.shifts[0];
   if (!shiftId) {
-    throw new Error(`No shift in zone or active.patient for zone ${zoneId}`);
+    throw new Error(`No shift in zone or active.patient for zone [${zoneId}]`);
   }
   return draft.shifts[shiftId];
 };
@@ -113,10 +113,10 @@ const reassignPatient = Undo.produce((draft: Board, eventId: BoardEventId, newSh
 
 function validateEvent(event: BoardEvent) {
   if (!event.patient) {
-    throw new Error(`Error: event: ${event.id} has no patient property.`);
+    throw new Error(`Event [${event.id}] has no patient property.`);
   }
   if (!event.shift) {
-    throw new Error(`Error: event: ${event.id} has no shift property.`);
+    throw new Error(`Event [${event.id}] has no shift property.`);
   }
 }
 
