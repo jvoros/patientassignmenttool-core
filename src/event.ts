@@ -29,10 +29,12 @@ const addReassign = (draft: Board, priorEventId: BoardEventId, newEventId: Board
   const event = draft.events[priorEventId];
   const newShiftId = draft.events[newEventId].shift;
   if (!newShiftId) {
+    console.error(`[addReassign] No shiftId found for newEventId [${newEventId}]`);
     throw new Error(`No event.shiftId found for newEventId [${newEventId}]`);
   }
   const newProvider = draft.shifts[newShiftId].provider;
   if (!newProvider) {
+    console.error(`[addReassign] No provider found for shiftId [${newShiftId}]`);
     throw new Error(`No shift found for shiftId [${newShiftId}]`);
   }
   event.message = `Reassigned to: ${newProvider.first} ${newProvider.last}`;

@@ -48,9 +48,10 @@ const getSuperZoneAndShift = (
   zone: Zone
 ): { superZoneId: ZoneId; superShiftId: ShiftId } => {
   if (!zone.superFrom && !zone.active.supervisor) {
-    throw new Error(
-      `Assign Error: zoneId [${zone.id}] has no 'superFrom:' property and no active.supervisor is set.`
+    console.error(
+      `[getSuperZoneAndShift]: zoneId [${zone.id}] has no 'superFrom:' property and no active.supervisor is set.`
     );
+    throw new Error(`Zone has no 'superFrom:' property and no active.supervisor is set.`);
   }
   // use ! non-null assertion because already checked at least one exists
   const superShiftId = zone.superFrom
@@ -79,7 +80,8 @@ const getActiveShift = (draft: Board, zoneId: ZoneId): Shift => {
   const zone = draft.zones[zoneId];
   const shiftId = zone.type.includes("rotation") ? zone.active.patient : zone.shifts[0];
   if (!shiftId) {
-    throw new Error(`No shift in zone or active.patient for zone [${zoneId}]`);
+    console.error(`[getActiveShift]: No shift in zone or active.patient for zone [${zoneId}]`);
+    throw new Error(`No shift in zone or next-patient for zone`);
   }
   return draft.shifts[shiftId];
 };
@@ -113,9 +115,11 @@ const reassignPatient = Undo.produce((draft: Board, eventId: BoardEventId, newSh
 
 function validateEvent(event: BoardEvent) {
   if (!event.patient) {
+    console.error(`[validateEvent]: Event [${event.id}] has no patient property.`);
     throw new Error(`Event [${event.id}] has no patient property.`);
   }
   if (!event.shift) {
+    console.error(`[validateEvent]: Event [${event.id}] has no shift property.`);
     throw new Error(`Event [${event.id}] has no shift property.`);
   }
 }
@@ -137,8 +141,27 @@ const handleSupervisorOnReassign = (newShift: Shift, shift: Shift, event: BoardE
   return undefined;
 };
 
+// CHANGE ROOM
+type ChangeRoom = (draft: Board, eventId: BoardEventId, newRoom: string) => Board;
+const changeRoom = Undo.produce((draft: Board, eventId: BoardEventId, newRoom: string) => {
+  const event = draft.events[eventId];
+  validateEvent(event);
+  const oldRoom = event.patient!.room;
+  event.patient!.room = newRoom;
+  event.type = "reassign";
+  event.message = `Changed room from ${oldRoom}`;
+  // event
+  const eventParams = {
+    type: "changeRoom",
+    shift: event.shift,
+    message: `Room changed from ${oldRoom} to ${newRoom}`,
+  };
+  return eventParams;
+}) as ChangeRoom;
+
 export default {
   assignToShift,
   assignToZone,
   reassignPatient,
+  changeRoom,
 };

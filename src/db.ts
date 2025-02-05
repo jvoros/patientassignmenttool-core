@@ -10,7 +10,6 @@ const createDbConnection = (mongoUri: string): any => {
   });
 
   const getSiteComplete = async (site: string) => {
-    await client.connect();
     const database = client.db("pat");
     const collection = database.collection("boards");
     return await collection.findOne({
@@ -19,7 +18,6 @@ const createDbConnection = (mongoUri: string): any => {
   };
 
   const getSiteDetails = async (site: string) => {
-    await client.connect();
     const database = client.db("pat");
     const collection = database.collection("boards");
     return await collection.findOne({ site }, { projection: { site: 1, details: 1 } });
@@ -33,14 +31,12 @@ const createDbConnection = (mongoUri: string): any => {
   };
 
   const updateBoard = async (site: string, board: any) => {
-    await client.connect();
     const database = client.db("pat");
     const collection = database.collection("boards");
     return await collection.updateOne({ site }, { $set: { board } });
   };
 
   const saveLogs = async (logs: LogItem[]) => {
-    await client.connect();
     const database = client.db("pat");
     const collection = database.collection("logs");
     return await collection.bulkWrite(
@@ -58,6 +54,7 @@ const createDbConnection = (mongoUri: string): any => {
     (fn: any): Function =>
     async (...args: any[]) => {
       try {
+        await client.connect();
         return await fn(...args);
       } catch (err) {
         console.error(err);

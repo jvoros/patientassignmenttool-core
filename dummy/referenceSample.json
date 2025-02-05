@@ -170,11 +170,12 @@
     ]
   },
   "board": {
-    "date": "09/25/2004",
+    "date": "01/01/2025",
     "zones": {
       "off": {
         "id": "off",
         "name": "Off",
+        "instruction": null,
         "type": "list",
         "active": {},
         "shifts": ["four", "five"]
@@ -183,6 +184,7 @@
         "id": "main",
         "order": 10,
         "name": "Main",
+        "instruction": "Stroke, Trauma or Critical patients should be given to a doctor.",
         "type": "rotation_super",
         "active": {
           "patient": "one",
@@ -194,6 +196,7 @@
         "id": "fasttrack",
         "order": 20,
         "name": "Fast Track",
+        "instruction": "Taking ESI 4s & 5s",
         "type": "ft_zone_patient",
         "superFrom": "main",
         "triggerSkip": ["app"],

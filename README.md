@@ -177,6 +177,16 @@ Signs out the specified shift.
 
 ---
 
+### # deleteShift()
+
+```ts
+function deleteShift(shiftId: ShiftId): Board;
+```
+
+Delete the specified shift. Will not delete shift if patients have been assigned.
+
+---
+
 ### # joinZone()
 
 ```ts
@@ -305,5 +315,15 @@ Handles all the logic to reassign a patient.
 If a patient was initially assigned to a physician and is reassigned to an APP, the original physician will be set as supervisor.
 
 If a patient was initially assigned to an APP and is reassigned to another APP, the original supervisor will stay set as the supervisor.
+
+---
+
+### # changeRoom()
+
+```ts
+function changeRoom(eventId: BoardEventId, newRoom: string): Board;
+```
+
+Changes the room of a patient assignement. Changes event type to `reassign` so both this function and `reassignPatient()` have the same event types.
 
 ---

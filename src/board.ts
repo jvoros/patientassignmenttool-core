@@ -66,6 +66,37 @@ const signOut = Undo.produce((draft, shiftId) => {
   return eventParams;
 }) as SignOut;
 
+// DELETE SHIFT
+
+type DeleteShift = (draft: Board, shiftId: ShiftId) => Board;
+const deleteShift = Undo.produce((draft, shiftId) => {
+  // Error if patients are assigned
+  const shift = draft.shifts[shiftId];
+  if (Object.keys(shift.counts).length > 0) {
+    console.error(`[deleteShift] Shift [${shiftId}] has patients assigned.`);
+    throw new Error(`Shift has patients assigned. Cannot be deleted.`);
+  }
+
+  // leave all zones, using Zone.leave will handle rotations
+  const inZone = Object.keys(draft.zones).filter((zoneId) =>
+    draft.zones[zoneId].shifts.includes(shiftId)
+  );
+  inZone.forEach((zoneId) => {
+    Zone.leave(draft, zoneId, shiftId);
+  });
+
+  // remove shift
+  delete draft.shifts[shiftId];
+
+  // event
+  const eventParams = {
+    type: "deleteShift",
+    shift: shiftId,
+    message: `Shift: ${shift.name} (${shift.provider.first} ${shift.provider.last}) was deleted.`,
+  };
+  return eventParams;
+}) as DeleteShift;
+
 // JOIN ZONE
 
 type JoinZone = (board: Board, zoneId: ZoneId, shiftId: ShiftId) => Board;
@@ -208,6 +239,7 @@ export default {
   undo: Undo.undo,
   signIn,
   signOut,
+  deleteShift,
   joinZone,
   leaveZone,
   switchZone,
@@ -218,4 +250,5 @@ export default {
   assignToShift: Assign.assignToShift,
   assignToZone: Assign.assignToZone,
   reassignPatient: Assign.reassignPatient,
+  changeRoom: Assign.changeRoom,
 };
