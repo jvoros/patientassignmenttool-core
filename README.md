@@ -14,6 +14,12 @@ The OOP approach became cumbersome because of all the scaffolding required just 
 
 Using Immer, you also get [patches](https://immerjs.github.io/immer/patches)! We can just store the `inversePatches` necessary to undo any event. This makes implementing undos trivial. This also makes the state object waaaaaaay smaller than holding the entire state in each event.
 
+### Hydrate
+
+The final innovation is hydrating the board before sending it to the client. The board document is structured in the optimal way for Immer but this isn't the best for the client. Hydrating the board puts complete `shift` and `event` objects at the appropriate places in the board. It also breaks `zones` into `zoneList1` and `zoneList2` for display in the client. This molds the board object into something easier to work with on the front end.
+
+The hydrated board is fetched with `getBoardHydrated()`.
+
 ## App Flow in this Version
 
 1. On startup, server gets site from database.
@@ -46,7 +52,7 @@ The `site` object is the static info related to the site: providers, schedule an
 
 The `board` object is the current state of that site. The `events` array can be limited to `site.event_limit`.
 
-[Sample Site Document](./dummy/siteDocumentFromMongo.json)
+[Sample Site Document](./dummy/siteDocument.json)
 
 [Sample Board](./dummy/sampleboard.js)
 
@@ -106,6 +112,16 @@ function getBoard(): Board;
 ```
 
 Returns just the `board` portion of the the `site` document from memory, if already instantiated, or from the database if first connection.
+
+---
+
+### # getBoardHydrated()
+
+```ts
+function getBoardHydrated(): BoardHydrated;
+```
+
+Returns `board` in the _hydrated_ form, meaning the most convenient form for the client. Hydrating the board puts complete `shift` and `event` objects at the appropriate places in the board. It also breaks `zones` into `zoneList1` and `zoneList2` for display in the client.
 
 ---
 
