@@ -24,7 +24,6 @@ const createDbConnection = (mongoUri: string): any => {
   };
 
   const getBoard = async (site: string) => {
-    await client.connect();
     const database = client.db("pat");
     const collection = database.collection("boards");
     return await collection.findOne({ site }, { projection: { site: 1, board: 1 } });
